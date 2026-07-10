@@ -1,0 +1,25 @@
+{
+    "model_name": "SafeStreet Random Forest v1",
+    "algorithm": "RandomForestClassifier",
+    "dataset": "dev_sample.parquet",
+    "training_samples": 800000,
+    "testing_samples": 200000,
+    "features": [
+        "Latitude",
+        "Longitude",
+        "Hour",
+        "DayOfWeek",
+        "Month",
+        "IsWeekend",
+        "District",
+        "Community Area",
+        "Location Description"
+    ],
+    "target": "RiskLevel",
+    "accuracy": 0.5964,
+    "training_time_seconds": 1643.04,
+    "training_time_minutes": 27.38,
+    "random_state": 42,
+    "n_estimators": 100,
+    "created_on": "2026-07-10 11:40:26"
+}
