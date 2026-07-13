@@ -1,0 +1,27 @@
+{
+    "model_name": "safestreet_xgb_v2",
+    "dataset": "processed_crime_v2.parquet",
+    "experiment": "E06",
+    "algorithm": "XGBoost",
+    "features": [
+        "Latitude",
+        "Longitude",
+        "Hour",
+        "DayOfWeek",
+        "Month",
+        "IsWeekend",
+        "District",
+        "Community Area",
+        "Location Description",
+        "TimeOfDay",
+        "IsNight",
+        "IsBusinessHours",
+        "Hour_sin",
+        "Hour_cos",
+        "Month_sin",
+        "Month_cos"
+    ],
+    "accuracy": 0.6226,
+    "training_time_seconds": 21.55,
+    "random_state": 42
+}
