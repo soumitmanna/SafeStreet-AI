@@ -59,6 +59,13 @@ import '../services/unsafe_zone_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/zone_ui_helper.dart';
 import '../widgets/report_unsafe_zone_sheet.dart';
+import '../models/prediction_exception.dart';
+import '../models/prediction_request.dart';
+import '../models/prediction_response.dart';
+import '../services/prediction_service.dart';
+import '../widgets/prediction_result_card.dart';
+
+enum _PredictionStatus { idle, loading, success, error }
 
 // ---------------------------------------------------------------------------
 // Fallback camera position
@@ -97,6 +104,9 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
 
   /// Shared location service for fetching position and starting streams.
   final LocationService _locationService = LocationService();
+
+  // ── Prediction (Phase 10) ──────────────────────────────────────────────────
+  late final PredictionService _predictionService;
 
   // ── Controllers ────────────────────────────────────────────────────────────
 
@@ -176,6 +186,7 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
   @override
   void initState() {
     super.initState();
+    _predictionService = PredictionService();
     _centerOnUserLocation();
     _scheduleHintDismissal();
     _startZonesStream();
@@ -522,6 +533,111 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
     });
   }
 
+  // ── AI Prediction ──────────────────────────────────────────────────────────
+
+  void _showPredictionSheet(Position position) {
+    // Scoped state for the bottom sheet
+    _PredictionStatus sheetStatus = _PredictionStatus.idle;
+    PredictionResponse? sheetResult;
+    PredictionException? sheetError;
+
+    // TODO: Replace placeholders with reverse-geocoding in a future phase
+    const int kPlaceholderDistrict = 1;
+    const int kPlaceholderCommunityArea = 1;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            void checkRisk() async {
+              setModalState(() {
+                sheetStatus = _PredictionStatus.loading;
+                sheetError = null;
+                sheetResult = null;
+              });
+
+              try {
+                final request = PredictionRequest.fromDateTime(
+                  dateTime: DateTime.now(),
+                  latitude: position.latitude,
+                  longitude: position.longitude,
+                  district: kPlaceholderDistrict, 
+                  communityArea: kPlaceholderCommunityArea,
+                  locationDescription: 'STREET',
+                );
+                
+                final errors = request.validate();
+                if (errors.isNotEmpty) {
+                  throw PredictionException(PredictionErrorType.validation, errors.first);
+                }
+
+                final result = await _predictionService.predict(request);
+
+                setModalState(() {
+                  sheetStatus = _PredictionStatus.success;
+                  sheetResult = result;
+                });
+              } on PredictionException catch (e) {
+                setModalState(() {
+                  sheetStatus = _PredictionStatus.error;
+                  sheetError = e;
+                });
+              } catch (e) {
+                setModalState(() {
+                  sheetStatus = _PredictionStatus.error;
+                  sheetError = PredictionException(PredictionErrorType.server, 'Prediction failed. Please try again.');
+                });
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'AI Risk Prediction',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  PredictionResultCard(
+                    result: sheetResult,
+                    error: sheetError,
+                    isLoading: sheetStatus == _PredictionStatus.loading,
+                    onRetry: checkRisk,
+                  ),
+                  const SizedBox(height: 16),
+                  if (sheetStatus == _PredictionStatus.idle)
+                    ElevatedButton(
+                      onPressed: checkRisk,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(50),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Analyze Current Location'),
+                    ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   /// Called by [ReportUnsafeZoneSheet] after a successful Firestore write.
   ///
   /// Shows a floating green SnackBar on the map screen. Called before
@@ -725,14 +841,36 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
         ],
       ),
 
-      // ── My Location FAB ─────────────────────────────────────────────────────
-      floatingActionButton: FloatingActionButton.small(
-        heroTag: 'unsafe_zone_map_my_location_fab',
-        backgroundColor: Colors.white,
-        elevation: 4,
-        onPressed: _centerOnUserLocation,
-        tooltip: 'My location',
-        child: Icon(Icons.my_location_rounded, color: AppTheme.primaryBlue),
+      // ── Action FABs ────────────────────────────────────────────────────────
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'prediction_fab',
+            backgroundColor: AppTheme.primaryBlue,
+            elevation: 4,
+            onPressed: () {
+              if (_lastKnownPosition != null) {
+                _showPredictionSheet(_lastKnownPosition!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Wait for location fix...')),
+                );
+              }
+            },
+            icon: const Icon(Icons.analytics_outlined, color: Colors.white),
+            label: const Text('Check Risk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.small(
+            heroTag: 'unsafe_zone_map_my_location_fab',
+            backgroundColor: Colors.white,
+            elevation: 4,
+            onPressed: _centerOnUserLocation,
+            tooltip: 'My location',
+            child: const Icon(Icons.my_location_rounded, color: AppTheme.primaryBlue),
+          ),
+        ],
       ),
     );
   }
