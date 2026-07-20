@@ -26,10 +26,5 @@ mobile_app/.packages
 .DS_Store
 Thumbs.db
 
-# ML Models
-saved_models/
-*.joblib
-*.pkl
-
 # Large experiment outputs
 reports/
