@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../controllers/profile_controller.dart';
 import '../models/user_profile_model.dart';
 import '../models/emergency_contact_model.dart';
@@ -8,7 +7,6 @@ import '../widgets/profile_avatar_widget.dart';
 import '../widgets/profile_badge_widget.dart';
 import 'edit_profile_screen.dart';
 import 'account_settings_screen.dart';
-import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -389,7 +387,6 @@ class _SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const settings = [
-      {'icon': Icons.notifications_rounded, 'title': 'Notifications', 'subtitle': 'Alert preferences'},
       {'icon': Icons.lock_rounded, 'title': 'Privacy', 'subtitle': 'Manage permissions'},
       {'icon': Icons.shield_rounded, 'title': 'Security', 'subtitle': 'Emergency access settings'},
       {'icon': Icons.help_outline_rounded, 'title': 'Support', 'subtitle': 'Help center'},

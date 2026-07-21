@@ -3,6 +3,7 @@ import '../controllers/account_settings_controller.dart';
 import '../services/account_settings_service.dart';
 import '../widgets/settings_section_header.dart';
 import '../widgets/settings_tile.dart';
+import '../widgets/settings_toggle_tile.dart';
 import '../widgets/settings_destructive_tile.dart';
 import '../widgets/profile_avatar_widget.dart';
 import 'edit_profile_screen.dart';
@@ -187,6 +188,17 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     ],
                   ),
                 ),
+                if (state is AccountSettingsLoaded) ...[
+                  const SettingsSectionHeader(title: 'Notifications'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: _buildNotificationSection(_controller.notificationState),
+                  ),
+                ],
               ],
             );
           }
@@ -195,5 +207,57 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         },
       ),
     );
+  }
+
+  Widget _buildNotificationSection(AccountSettingsNotificationState notifState) {
+    if (notifState is AccountSettingsNotificationLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(24.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    
+    if (notifState is AccountSettingsNotificationError) {
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Center(child: Text(notifState.error, style: const TextStyle(color: Colors.red))),
+      );
+    }
+    
+    if (notifState is AccountSettingsNotificationLoaded) {
+      final prefs = notifState.prefs;
+      return Column(
+        children: [
+          SettingsToggleTile(
+            icon: Icons.notifications_active_rounded,
+            title: 'Allow Notifications',
+            subtitle: 'Master toggle for all alerts',
+            value: prefs.masterEnabled,
+            onChanged: _controller.setMasterNotificationEnabled,
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SettingsToggleTile(
+            icon: Icons.warning_rounded,
+            title: 'Emergency Alerts',
+            subtitle: 'Receive alerts from nearby users',
+            value: prefs.emergencyAlertEnabled,
+            enabled: prefs.masterEnabled,
+            onChanged: _controller.setEmergencyAlertNotifications,
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SettingsToggleTile(
+            icon: Icons.check_circle_rounded,
+            title: 'SOS Confirmation',
+            subtitle: 'Notify when SOS is received',
+            value: prefs.sosConfirmationEnabled,
+            enabled: prefs.masterEnabled,
+            onChanged: _controller.setSosConfirmationNotifications,
+          ),
+          const SizedBox(height: 8),
+        ],
+      );
+    }
+    
+    return const SizedBox.shrink();
   }
 }
