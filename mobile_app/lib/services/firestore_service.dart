@@ -20,10 +20,16 @@ class FirestoreService {
 
     await _firestore.collection('users').doc(user.uid).set({
       'uid': user.uid,
+      'displayName': user.displayName ?? 'New User',
       'email': user.email ?? '',
-      'name': 'New User',
-      'phone': '',
+      'phoneNumber': user.phoneNumber,
+      'photoURL': user.photoURL,
+      'isVerified': user.emailVerified,
+      'accountCreated': user.metadata.creationTime != null ? Timestamp.fromDate(user.metadata.creationTime!) : null,
+      'lastLogin': FieldValue.serverTimestamp(),
       'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'badges': user.emailVerified ? ['verified'] : [],
       'emergencyMode': false,
       'profileCompleted': false,
     });

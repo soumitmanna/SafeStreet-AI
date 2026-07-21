@@ -18,7 +18,7 @@ class AppConfig {
 
     switch (_env) {
       case 'production':
-        return 'https://api.safestreet.ai';
+        return 'https://safestreet-ai-backend.onrender.com';
       case 'device':
         // Expects --dart-define=API_BASE_URL=<LAN-IP> to be provided.
         // If it was missing, we fallback to a safe placeholder.

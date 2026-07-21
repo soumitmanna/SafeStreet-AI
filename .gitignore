@@ -9,6 +9,8 @@ ml_backend/**/*.pyc
 # Models
 ml_backend/saved_models/*.pkl
 ml_backend/saved_models/*.joblib
+ml_backend/saved_models/**/*.pkl
+ml_backend/saved_models/**/*.joblib
 
 # Environment
 .env
