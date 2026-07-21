@@ -7,6 +7,7 @@ import '../services/emergency_contact_service.dart';
 import '../widgets/profile_avatar_widget.dart';
 import '../widgets/profile_badge_widget.dart';
 import 'edit_profile_screen.dart';
+import 'account_settings_screen.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -33,16 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogout() async {
-    await FirebaseAuth.instance.signOut();
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -53,6 +44,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black87,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AccountSettingsScreen(
+                    profileController: _controller,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -74,7 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
                 const _SettingsSection(),
                 const SizedBox(height: 28),
-                _buildLogoutButton(context),
               ],
             ),
           ),
@@ -373,18 +378,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         if (!isLast) const Divider(height: 0, indent: 18, endIndent: 18),
       ],
-    );
-  }
-
-  Widget _buildLogoutButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _handleLogout,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF000000),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      child: const Text('Logout', style: TextStyle(fontWeight: FontWeight.w700)),
     );
   }
 }
