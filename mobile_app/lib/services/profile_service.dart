@@ -28,6 +28,16 @@ class ProfileDataCorruptedException extends ProfileException {
   const ProfileDataCorruptedException() : super("Profile data is corrupted. Please contact support.");
 }
 
+class ProfileOfflineException extends ProfileException {
+  const ProfileOfflineException() : super("No internet connection. Your changes will sync when you reconnect.");
+}
+
+class ProfileValidationException extends ProfileException {
+  final String field;
+  final String reason;
+  ProfileValidationException(this.field, this.reason) : super(reason);
+}
+
 class ProfileService {
   final ProfileRepository _repository;
   final FirebaseAuth _auth;
@@ -61,6 +71,32 @@ class ProfileService {
 
     try {
       return await _repository.fetchProfile(uid, forceServerFetch: forceServerFetch);
+    } on FirebaseException catch (e) {
+      if (e.code == 'unavailable') {
+        throw const ProfileFirestoreUnavailableException();
+      } else if (e.code == 'permission-denied') {
+        throw const ProfileAuthExpiredException();
+      }
+      throw const ProfileNetworkException();
+    } catch (e) {
+      throw const ProfileDataCorruptedException();
+    }
+  }
+  Future<UserProfileModel> updateProfile(String uid, {required String displayName, String? phoneNumber}) async {
+    if (uid.isEmpty) {
+      throw const ProfileNotAuthenticatedException();
+    }
+    
+    if (_auth.currentUser == null) {
+      throw const ProfileAuthExpiredException();
+    }
+    
+    await _repository.updateProfileFields(uid, displayName: displayName, phoneNumber: phoneNumber);
+    
+    debugPrint('[ProfileService] Profile updated for uid: $uid');
+    
+    try {
+      return await _repository.fetchProfile(uid, forceServerFetch: false);
     } on FirebaseException catch (e) {
       if (e.code == 'unavailable') {
         throw const ProfileFirestoreUnavailableException();

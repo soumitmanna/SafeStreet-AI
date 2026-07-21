@@ -6,6 +6,7 @@ import '../models/user_profile_model.dart';
 import '../services/contact_service.dart';
 import '../widgets/profile_avatar_widget.dart';
 import '../widgets/profile_badge_widget.dart';
+import 'edit_profile_screen.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -233,6 +234,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ],
           ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit_outlined, color: Colors.black54),
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfileScreen(
+                  profile: profile,
+                  profileController: _controller,
+                ),
+              ),
+            );
+            if (result == true) {
+              _controller.loadProfile();
+            }
+          },
         ),
       ],
     );

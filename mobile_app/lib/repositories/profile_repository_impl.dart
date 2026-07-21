@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'profile_repository.dart';
 import '../models/user_profile_model.dart';
+import '../services/profile_service.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -97,6 +98,27 @@ class ProfileRepositoryImpl implements ProfileRepository {
         'isVerified': authUser.emailVerified,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+    }
+  }
+  @override
+  Future<void> updateProfileFields(String uid, {required String displayName, String? phoneNumber}) async {
+    try {
+      await _firestore.collection('users').doc(uid).set({
+        'displayName': displayName,
+        'phoneNumber': phoneNumber,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      debugPrint('[ProfileRepositoryImpl] Firestore write: users/$uid — displayName, phoneNumber');
+    } on FirebaseException catch (e) {
+      if (e.code == 'unavailable') {
+        debugPrint('[ProfileRepositoryImpl] Offline write queued for: users/$uid');
+        throw const ProfileOfflineException();
+      } else if (e.code == 'permission-denied') {
+        throw const ProfileAuthExpiredException();
+      }
+      throw const ProfileFirestoreUnavailableException();
+    } catch (e) {
+      throw const ProfileFirestoreUnavailableException();
     }
   }
 }

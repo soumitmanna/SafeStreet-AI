@@ -110,4 +110,25 @@ class UserProfileModel {
       isVerified: false,
     );
   }
+
+  /// Creates a copy of this model with the given fields replaced with the new values.
+  UserProfileModel copyWith({
+    String? displayName,
+    String? phoneNumber,
+    DateTime? updatedAt,
+  }) {
+    return UserProfileModel(
+      uid: uid,
+      displayName: displayName ?? this.displayName,
+      email: email,
+      phoneNumber: phoneNumber != null ? (phoneNumber.isEmpty ? null : phoneNumber) : this.phoneNumber,
+      photoURL: photoURL,
+      isVerified: isVerified,
+      accountCreated: accountCreated,
+      lastLogin: lastLogin,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      badges: badges,
+    );
+  }
 }

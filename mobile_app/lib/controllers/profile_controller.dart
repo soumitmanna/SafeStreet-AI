@@ -93,4 +93,9 @@ class ProfileController extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 300));
     await loadProfile(forceServerFetch: true);
   }
+
+  void invalidateCache() {
+    _lastFetchTime = null;
+    _lastProfile = null;
+  }
 }
