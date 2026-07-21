@@ -100,15 +100,50 @@ class ProfileRepositoryImpl implements ProfileRepository {
       }, SetOptions(merge: true));
     }
   }
+
   @override
-  Future<void> updateProfileFields(String uid, {required String displayName, String? phoneNumber}) async {
+  Future<void> updateProfileFields(
+    String uid, {
+    required String displayName,
+    String? phoneNumber,
+    String? photoURL,
+  }) async {
     try {
       await _firestore.collection('users').doc(uid).set({
         'displayName': displayName,
         'phoneNumber': phoneNumber,
+        'photoURL': photoURL,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      debugPrint('[ProfileRepositoryImpl] Firestore write: users/$uid — displayName, phoneNumber');
+      debugPrint('[ProfileRepositoryImpl] Firestore write: users/$uid — base profile fields');
+    } on FirebaseException catch (e) {
+      if (e.code == 'unavailable') {
+        debugPrint('[ProfileRepositoryImpl] Offline write queued for: users/$uid');
+        throw const ProfileOfflineException();
+      } else if (e.code == 'permission-denied') {
+        throw const ProfileAuthExpiredException();
+      }
+      throw const ProfileFirestoreUnavailableException();
+    } catch (e) {
+      throw const ProfileFirestoreUnavailableException();
+    }
+  }
+
+  @override
+  Future<void> updateExtendedFields(
+    String uid, {
+    String? gender,
+    String? bloodGroup,
+    String? medicalNotes,
+  }) async {
+    try {
+      await _firestore.collection('users').doc(uid).set({
+        'gender': gender,
+        'bloodGroup': bloodGroup,
+        'medicalNotes': medicalNotes,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      debugPrint('[ProfileRepositoryImpl] Firestore write: users/$uid — extended fields');
     } on FirebaseException catch (e) {
       if (e.code == 'unavailable') {
         debugPrint('[ProfileRepositoryImpl] Offline write queued for: users/$uid');
