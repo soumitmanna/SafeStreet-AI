@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/evidence_model.dart';
-import '../services/contact_service.dart';
+import '../models/emergency_contact_model.dart';
+import '../services/emergency_contact_service.dart';
 import '../services/evidence_service.dart';
 import '../services/sos_service.dart';
 import 'assist_screen.dart';
+import 'emergency_contacts_screen.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -19,7 +21,7 @@ class SosScreen extends StatefulWidget {
 class _SosScreenState extends State<SosScreen> {
   final SosService _sosService = SosService();
   final EvidenceService _evidenceService = EvidenceService();
-  final ContactService _contactService = ContactService();
+  final EmergencyContactService _contactService = EmergencyContactService();
 
   bool _emergencyActive = false;
   bool _isSending = false;
@@ -29,7 +31,7 @@ class _SosScreenState extends State<SosScreen> {
   String _location = 'Waiting for SOS activation';
   String? _mapsLink;
   EvidenceModel? _selectedEvidence;
-  List<Map<String, dynamic>> _contacts = const [];
+  List<EmergencyContactModel> _contacts = const [];
 
   @override
   void initState() {
@@ -140,7 +142,7 @@ class _SosScreenState extends State<SosScreen> {
 
   Future<void> _loadContacts() async {
     try {
-      final contacts = await _contactService.getContactList();
+      final contacts = await _contactService.getContactsForSOS();
       if (!mounted) return;
 
       setState(() {
@@ -751,8 +753,8 @@ class _SosScreenState extends State<SosScreen> {
             )
           else
             ...contacts.map((contact) {
-              final name = (contact['name'] ?? '').toString();
-              final relation = (contact['relation'] ?? '').toString();
+              final name = contact.displayName;
+              final relation = contact.relationship ?? '';
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
@@ -762,7 +764,7 @@ class _SosScreenState extends State<SosScreen> {
                       radius: 24,
                       backgroundColor: const Color(0xFFDBEAFE),
                       child: Text(
-                        name.split(' ').where((word) => word.isNotEmpty).map((word) => word[0]).take(2).join(),
+                        contact.initials,
                         style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -771,14 +773,30 @@ class _SosScreenState extends State<SosScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (contact.isPrimary) ...[
+                                const SizedBox(width: 6),
+                                const Icon(Icons.star_rounded, size: 14, color: Color(0xFF1D4ED8)),
+                              ],
+                            ],
+                          ),
                           const SizedBox(height: 4),
                           Text(relation.isEmpty ? 'Trusted contact' : relation, style: const TextStyle(color: Colors.black54)),
                         ],
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _contactService.smsContact(contact).catchError((_) {});
+                      },
                       icon: const Icon(Icons.message_rounded, color: Color(0xFF2563EB)),
                     ),
                   ],
@@ -787,7 +805,12 @@ class _SosScreenState extends State<SosScreen> {
             }),
           const SizedBox(height: 6),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EmergencyContactsScreen()),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

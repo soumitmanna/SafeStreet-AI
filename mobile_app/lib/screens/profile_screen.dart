@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../controllers/profile_controller.dart';
 import '../models/user_profile_model.dart';
-import '../services/contact_service.dart';
+import '../models/emergency_contact_model.dart';
+import '../services/emergency_contact_service.dart';
 import '../widgets/profile_avatar_widget.dart';
 import '../widgets/profile_badge_widget.dart';
 import 'edit_profile_screen.dart';
@@ -18,7 +18,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final ProfileController _controller;
-  final ContactService _contactService = ContactService();
+  final EmergencyContactService _contactService = EmergencyContactService();
 
   @override
   void initState() {
@@ -271,8 +271,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: Colors.black12),
           ),
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _contactService.getContacts(),
+          child: StreamBuilder<List<EmergencyContactModel>>(
+            stream: _contactService.streamContacts(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
@@ -286,17 +286,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Center(child: Text('Failed to load contacts')),
                 );
               }
-              final docs = snapshot.data?.docs ?? [];
-              if (docs.isEmpty) {
+              final contacts = snapshot.data ?? [];
+              if (contacts.isEmpty) {
                 return const Padding(
                   padding: EdgeInsets.all(24.0),
                   child: Center(child: Text('No contacts added', style: TextStyle(color: Colors.black54))),
                 );
               }
               return Column(
-                children: List.generate(docs.length, (index) {
-                  final contact = docs[index].data() as Map<String, dynamic>;
-                  final isLast = index == docs.length - 1;
+                children: List.generate(contacts.length, (index) {
+                  final contact = contacts[index];
+                  final isLast = index == contacts.length - 1;
                   return _buildContactRow(context, contact, isLast);
                 }),
               );
@@ -307,12 +307,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildContactRow(BuildContext context, Map<String, dynamic> contact, bool isLast) {
-    final name = contact['name'] as String? ?? 'Unknown';
-    final role = contact['role'] as String? ?? 'Contact';
-    final phone = contact['phone'] as String? ?? '';
-    
-    final initials = name.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join().toUpperCase();
+  Widget _buildContactRow(BuildContext context, EmergencyContactModel contact, bool isLast) {
+    final name = contact.displayName;
+    final relationship = contact.relationship?.trim().isNotEmpty == true
+        ? contact.relationship!
+        : 'Trusted contact';
+    final phone = contact.formattedPhone;
 
     return Column(
       children: [
@@ -322,15 +322,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
             radius: 24,
             backgroundColor: const Color(0xFFE0F2FE),
             child: Text(
-              initials,
+              contact.initials,
               style: const TextStyle(color: Color(0xFF0369A1), fontWeight: FontWeight.w700),
             ),
           ),
-          title: Text(name, style: const TextStyle(fontWeight: FontWeight.w700)),
-          subtitle: Text('$role · $phone', style: const TextStyle(color: Colors.black54)),
+          title: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  name,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (contact.isPrimary) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Primary',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0369A1),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          subtitle: Text('$relationship · $phone', style: const TextStyle(color: Colors.black54)),
           trailing: IconButton(
             icon: const Icon(Icons.call, color: Color(0xFF0EA5E9)),
-            onPressed: () {},
+            onPressed: () async {
+              try {
+                await _contactService.callContact(contact);
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not initiate call: ${contact.displayName}')),
+                  );
+                }
+              }
+            },
           ),
         ),
         if (!isLast) const Divider(height: 0, indent: 18, endIndent: 18),

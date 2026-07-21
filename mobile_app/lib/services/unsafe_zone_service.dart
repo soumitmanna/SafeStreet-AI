@@ -99,7 +99,7 @@ class UnsafeZoneService {
   /// Returns the currently authenticated user.
   ///
   /// Throws an [Exception] if no user is signed in. This mirrors the
-  /// auth guard pattern used throughout [ContactService] and [AlertService].
+  /// auth guard pattern used throughout the app services.
   User _requireAuth() {
     final user = _auth.currentUser;
 

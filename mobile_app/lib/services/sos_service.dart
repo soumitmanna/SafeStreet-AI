@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../models/evidence_model.dart';
 import 'communication_service.dart';
-import 'contact_service.dart';
+import 'emergency_contact_service.dart';
 
 enum SosFailureType {
   unauthenticated,
@@ -69,14 +69,14 @@ class SosService {
   SosService({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
-    ContactService? contactService,
+    EmergencyContactService? contactService,
   })  : _auth = auth ?? FirebaseAuth.instance,
         _firestore = firestore ?? FirebaseFirestore.instance,
-        _contactService = contactService ?? ContactService();
+        _contactService = contactService ?? EmergencyContactService();
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
-  final ContactService _contactService;
+  final EmergencyContactService _contactService;
 
   Future<LocationInfo> resolveCurrentLocation() async {
     await _ensureLocationPermission();
@@ -237,7 +237,7 @@ class SosService {
     required String mapsLink,
   }) async {
     try {
-      final contacts = await _contactService.getContactList();
+      final contacts = await _contactService.getContactsForSOS();
       if (contacts.isEmpty) {
         return const _NotificationResult(contactsNotified: 0, smsFailedCount: 0);
       }
@@ -260,7 +260,7 @@ Maps: $mapsLink
       var failedCount = 0;
 
       for (final contact in contacts) {
-        final phone = (contact['phone'] ?? '').toString().trim();
+        final phone = contact.phone.trim();
         if (phone.isEmpty) {
           continue;
         }

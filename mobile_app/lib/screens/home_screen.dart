@@ -3,7 +3,7 @@ import 'alerts_screen.dart';
 import 'profile_screen.dart';
 import 'sos_screen.dart';
 import 'location_screen.dart';
-import 'contacts_screen.dart';
+import 'emergency_contacts_screen.dart';
 import 'assist_feed_screen.dart';
 import 'journey_timer_screen.dart';
 import 'evidence_screen.dart';
@@ -128,7 +128,7 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              const ContactsScreen(),
+                              const EmergencyContactsScreen(),
                         ),
                       );
                     },
