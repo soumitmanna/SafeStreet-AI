@@ -12,7 +12,7 @@ class SettingsNotAuthenticatedException extends SettingsException {
 }
 
 class SettingsOperationFailedException extends SettingsException {
-  const SettingsOperationFailedException(String message) : super(message);
+  const SettingsOperationFailedException(super.message);
 }
 
 class AccountSettingsService {

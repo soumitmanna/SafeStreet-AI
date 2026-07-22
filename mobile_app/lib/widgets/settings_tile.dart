@@ -29,25 +29,25 @@ class SettingsTile extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: (iconColor ?? const Color(0xFF2563EB)).withValues(alpha: 0.1),
+          color: (iconColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: iconColor ?? const Color(0xFF2563EB), size: 22),
+        child: Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.primary, size: 22),
       ),
       title: Text(
         title,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: textColor ?? Colors.black87,
+          color: textColor ?? Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
       subtitle: subtitle != null
           ? Text(
               subtitle!,
-              style: const TextStyle(color: Colors.black54, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 13),
             )
           : null,
-      trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right_rounded, color: Colors.black38) : null),
+      trailing: trailing ?? (onTap != null ? Icon(Icons.chevron_right_rounded, color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5)) : null),
       onTap: onTap,
     );
   }

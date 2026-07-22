@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../services/alert_service.dart';
-
+import '../theme/app_theme.dart';
 import 'home_screen.dart';
 
 class LocationTrackingService {
@@ -39,9 +39,9 @@ class _AssistScreenState extends State<AssistScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('SOS ended successfully.'),
-          backgroundColor: Color(0xFF16A34A),
+        SnackBar(
+          content: const Text('SOS ended successfully.'),
+          backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
         ),
       );
 
@@ -55,7 +55,7 @@ class _AssistScreenState extends State<AssistScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to end SOS: $error'),
-          backgroundColor: const Color(0xFFDC2626),
+          backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
         ),
       );
     } finally {
@@ -70,12 +70,8 @@ class _AssistScreenState extends State<AssistScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('ASSIST ACTIVE'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: SafeArea(
         child: Padding(
@@ -87,13 +83,13 @@ class _AssistScreenState extends State<AssistScreen> {
               Container(
                 width: 132,
                 height: 132,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDCFCE7),
+                decoration: BoxDecoration(
+                  color: theme.extension<AppStatusColors>()?.success.withValues(alpha: 0.1) ?? Colors.green.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.shield_rounded,
-                  color: Color(0xFF16A34A),
+                  color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                   size: 78,
                 ),
               ),
@@ -102,7 +98,7 @@ class _AssistScreenState extends State<AssistScreen> {
                 'Emergency Activated',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -111,7 +107,7 @@ class _AssistScreenState extends State<AssistScreen> {
                 'Your live location has been shared.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: Colors.black54,
+                  color: theme.colorScheme.onSurfaceVariant,
                   height: 1.4,
                 ),
               ),
@@ -119,24 +115,24 @@ class _AssistScreenState extends State<AssistScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: theme.colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black12),
+                  border: Border.all(color: theme.dividerColor),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: theme.shadowColor.withValues(alpha: 0.04),
                       blurRadius: 18,
                       offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Status:',
                       style: TextStyle(
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -154,8 +150,8 @@ class _AssistScreenState extends State<AssistScreen> {
               ElevatedButton(
                 onPressed: _isEnding ? null : _endSos,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF16A34A),
-                  foregroundColor: Colors.white,
+                  backgroundColor: theme.extension<AppStatusColors>()?.success ?? Colors.green,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
@@ -187,10 +183,10 @@ class _StatusItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Text(
-          '●',
+        Text(
+          '•',
           style: TextStyle(
-            color: Color(0xFF16A34A),
+            color: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -198,8 +194,8 @@ class _StatusItem extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           text,
-          style: const TextStyle(
-            color: Colors.black87,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),

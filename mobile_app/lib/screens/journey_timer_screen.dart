@@ -1,7 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../services/sos_service.dart';
+import '../theme/app_theme.dart';
 import 'assist_screen.dart';
 
 class JourneyTimerScreen extends StatefulWidget {
@@ -144,15 +145,12 @@ class _JourneyTimerScreenState extends State<JourneyTimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: const Text(
           "Journey Timer",
           style: TextStyle(
-            color: Color(0xFF0F172A),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -165,12 +163,12 @@ class _JourneyTimerScreenState extends State<JourneyTimerScreen> {
           children: [
             const SizedBox(height: 30),
 
-            const Text(
+            Text(
               "Set Journey Duration",
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: theme.colorScheme.onSurface,
               ),
             ),
 
@@ -179,10 +177,10 @@ class _JourneyTimerScreenState extends State<JourneyTimerScreen> {
             Center(
               child: Text(
                 _formattedTime,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 42,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -238,8 +236,8 @@ class _JourneyTimerScreenState extends State<JourneyTimerScreen> {
                 height: 55,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
+                    backgroundColor: theme.extension<AppStatusColors>()?.success ?? Colors.green,
+                    foregroundColor: theme.colorScheme.onPrimary,
                   ),
                   onPressed: _stopTimer,
                   icon: const Icon(Icons.check_circle),

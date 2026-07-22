@@ -1,16 +1,16 @@
-/// =============================================================
-/// SafeStreet
-/// Evidence Model
-///
-/// Represents a captured photo or video that can be attached
-/// to an SOS alert.
-///
-/// Current Storage:
-///   • Local Device
-///
-/// Future Upgrade:
-///   • Firebase Storage
-/// =============================================================
+// =============================================================
+// SafeStreet
+// Evidence Model
+//
+// Represents a captured photo or video that can be attached
+// to an SOS alert.
+//
+// Current Storage:
+//   • Local Device
+//
+// Future Upgrade:
+//   • Firebase Storage
+// =============================================================
 
 enum EvidenceType {
   image,

@@ -186,15 +186,12 @@ class _RescueScreenState extends State<RescueScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: const Text(
           "Rescue",
           style: TextStyle(
-            color: Color(0xFF0F172A),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -236,15 +233,43 @@ class _RescueScreenState extends State<RescueScreen> {
 
             const SizedBox(height: 10),
 
-            Text(
-              _distanceInMeters == null
-                  ? "Live tracking is active."
-                  : "📍 Distance : ${(_distanceInMeters! / 1000).toStringAsFixed(2)} km\n⏱ ETA : $_eta",
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
+            if (_distanceInMeters == null)
+              Text(
+                "Live tracking is active.",
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 16,
+                ),
+              )
+            else
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.location_on_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Distance : ${(_distanceInMeters! / 1000).toStringAsFixed(2)} km",
+                        style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.timer_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 8),
+                      Text(
+                        "ETA : $_eta",
+                        style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
 
             const Spacer(),
 
@@ -252,6 +277,10 @@ class _RescueScreenState extends State<RescueScreen> {
               height: 55,
               child: ElevatedButton.icon(
                 onPressed: _openNavigation,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
                 icon: const Icon(Icons.navigation),
                 label: const Text(
                   "Navigate",

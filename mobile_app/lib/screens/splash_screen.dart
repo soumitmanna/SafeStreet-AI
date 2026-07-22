@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
     Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -14,19 +21,21 @@ class SplashScreen extends StatelessWidget {
         ),
       );
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             CircleAvatar(
               radius: 50,
-              backgroundColor: Color(0xFF2563EB),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: Icon(
                 Icons.shield,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 size: 50,
               ),
             ),
@@ -42,7 +51,7 @@ class SplashScreen extends StatelessWidget {
             Text(
               "Women Safety & Emergency Response",
               style: TextStyle(
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 16,
               ),
             ),

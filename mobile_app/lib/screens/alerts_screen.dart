@@ -16,8 +16,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/alert_model.dart';
-import '../services/alert_service.dart';
 import '../utils/alert_ui_helper.dart';
+import '../services/alert_service.dart';
 import 'alert_details_screen.dart';
 
 class AlertsScreen extends StatefulWidget {
@@ -45,12 +45,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Alerts'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
@@ -72,14 +68,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       Icon(
                         Icons.cloud_off_rounded,
                         size: 52,
-                        color: Colors.black26,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         "Couldn't load alerts. Check your internet connection and try again.",
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.black54,
+                          color: theme.colorScheme.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
@@ -105,14 +101,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       Icon(
                         Icons.verified_user_rounded,
                         size: 52,
-                        color: Colors.black26,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         "You're safe! No active alerts nearby.",
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.black54,
+                          color: theme.colorScheme.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
@@ -140,14 +136,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
                           style:
                               theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'View the latest activity and status updates for your safety network.',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.black54, height: 1.4),
+                              color: theme.colorScheme.onSurfaceVariant, height: 1.4),
                         ),
                         const SizedBox(height: 22),
                         isWide
@@ -197,7 +193,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Widget _buildAlertCard(BuildContext context, AlertModel alert) {
     final theme = Theme.of(context);
-    final color = alertStatusColor(alert.status);
+    final color = alertStatusColor(context, alert.status);
 
     return InkWell(
       onTap: () {
@@ -210,12 +206,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
       borderRadius: BorderRadius.circular(24),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: theme.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(color: theme.dividerColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: theme.shadowColor.withValues(alpha: 0.03),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),
@@ -230,7 +226,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 // Status icon
                 Container(
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   width: 52,
@@ -256,7 +252,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       Text(
                         alertRelativeTime(alert.createdAt),
                         style: theme.textTheme.bodySmall
-                            ?.copyWith(color: Colors.black54),
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -266,15 +262,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black12),
+                    border: Border.all(color: theme.dividerColor),
                   ),
                   child: Text(
                     alert.status,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -285,7 +281,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
             Row(
               children: [
                 Icon(Icons.person_outline_rounded,
-                    size: 14, color: Colors.black38),
+                    size: 14, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -295,7 +291,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall
-                        ?.copyWith(color: Colors.black54),
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ),
               ],

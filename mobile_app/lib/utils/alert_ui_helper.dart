@@ -1,20 +1,6 @@
-// =============================================================
-// SafeStreet
-// Alert UI Helper
-//
-// Pure, stateless helper functions used by any screen that
-// renders AlertModel data.
-//
-// Extracted from AlertsScreen (Phase 11.1) so that
-// AlertDetailsScreen (Phase 11.2) can reuse without
-// duplication.
-//
-// All functions are top-level so they can be imported with a
-// simple `import '../utils/alert_ui_helper.dart';`.
-// =============================================================
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
 // Status colour
@@ -22,17 +8,19 @@ import 'package:intl/intl.dart';
 
 /// Returns the display colour for a given Firestore alert [status] string.
 ///
+/// Uses the [AppStatusColors] theme extension for theme-aware colors.
 /// Known values: 'active', 'accepted', 'resolved'.
-Color alertStatusColor(String status) {
+Color alertStatusColor(BuildContext context, String status) {
+  final statusColors = Theme.of(context).extension<AppStatusColors>();
   switch (status) {
     case 'active':
-      return const Color(0xFFFB923C); // orange
+      return statusColors?.warning ?? const Color(0xFFFB923C);
     case 'accepted':
-      return const Color(0xFF3B82F6); // blue
+      return Theme.of(context).colorScheme.primary;
     case 'resolved':
-      return const Color(0xFF22C55E); // green
+      return statusColors?.success ?? const Color(0xFF22C55E);
     default:
-      return const Color(0xFF0EA5E9); // sky
+      return statusColors?.info ?? const Color(0xFF0EA5E9);
   }
 }
 

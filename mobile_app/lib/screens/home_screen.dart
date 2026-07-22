@@ -8,6 +8,7 @@ import 'assist_feed_screen.dart';
 import 'journey_timer_screen.dart';
 import 'evidence_screen.dart';
 import 'unsafe_zone_map_screen.dart';
+import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,15 +16,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: const Text(
           "SafeStreet",
           style: TextStyle(
-            color: Color(0xFF0F172A),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -35,21 +31,30 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Welcome Back 👋",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
-              ),
+            Row(
+              children: [
+                const Text(
+                  "Welcome Back",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.waving_hand_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 26,
+                ),
+              ],
             ),
 
             const SizedBox(height: 8),
 
-            const Text(
+            Text(
               "Your safety network is active",
               style: TextStyle(
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 16,
               ),
             ),
@@ -67,8 +72,8 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
-                  shadowColor: Colors.red.withValues(alpha: 0.3),
+                  backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
+                  shadowColor: (Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red).withValues(alpha: 0.3),
                   elevation: 12,
                   shape: const CircleBorder(),
                   fixedSize: const Size(220, 220),
@@ -76,7 +81,7 @@ class HomeScreen extends StatelessWidget {
                 child: const Text(
                   'SOS',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.white, // SOS button text is always white for contrast
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
                   ),
@@ -253,15 +258,15 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
 
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
 
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(
                     Icons.shield,
-                    color: Colors.green,
+                    color: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
                     size: 40,
                   ),
 
@@ -332,7 +337,7 @@ class HomeScreen extends StatelessWidget {
         height: 110,
 
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
         ),
 
@@ -342,7 +347,7 @@ class HomeScreen extends StatelessWidget {
             Icon(
               icon,
               size: 35,
-              color: const Color(0xFF2563EB),
+              color: Theme.of(context).colorScheme.primary,
             ),
 
             const SizedBox(height: 10),

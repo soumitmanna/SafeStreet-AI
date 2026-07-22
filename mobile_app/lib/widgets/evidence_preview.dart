@@ -76,7 +76,7 @@ class _EvidencePreviewState extends State<EvidencePreview> {
       return Container(
         height: 300,
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Center(
@@ -97,7 +97,7 @@ class _EvidencePreviewState extends State<EvidencePreview> {
 
           FloatingActionButton(
             mini: true,
-            backgroundColor: Colors.black54,
+            backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
             onPressed: () {
               setState(() {
                 if (_videoController!.value.isPlaying) {
@@ -111,7 +111,7 @@ class _EvidencePreviewState extends State<EvidencePreview> {
               _videoController!.value.isPlaying
                   ? Icons.pause
                   : Icons.play_arrow,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
             ),
           ),
         ],

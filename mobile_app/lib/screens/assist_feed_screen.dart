@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/alert_service.dart';
 import '../services/assist_service.dart'; // kDeveloperMode
+import '../theme/app_theme.dart';
 import 'rescue_screen.dart';
 
 class AssistFeedScreen extends StatelessWidget {
@@ -13,15 +14,12 @@ class AssistFeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AlertService alertService = AlertService();
 
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: const Text(
           "ASSIST",
           style: TextStyle(
-            color: Color(0xFF0F172A),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -82,11 +80,11 @@ class AssistFeedScreen extends StatelessWidget {
                     crossAxisAlignment:
                         CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
                           Icon(
                             Icons.warning,
-                            color: Colors.red,
+                            color: theme.extension<AppStatusColors>()?.sos ?? Colors.red,
                           ),
                           SizedBox(width: 8),
                           Text(
@@ -102,19 +100,34 @@ class AssistFeedScreen extends StatelessWidget {
 
                       const SizedBox(height: 16),
 
-                      Text(
-                        "📍 ${data["location"]}",
-                        style:
-                            const TextStyle(fontSize: 16),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.location_on_rounded, size: 20, color: theme.colorScheme.onSurface),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "${data["location"]}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
                       ),
-
                       const SizedBox(height: 8),
-
-                      Text(
-                        "👤 ${data["userEmail"]}",
-                        style: const TextStyle(
-                          color: Colors.grey,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.person_rounded, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "${data["userEmail"]}",
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
 
                       const SizedBox(height: 18),
@@ -130,10 +143,9 @@ class AssistFeedScreen extends StatelessWidget {
                           style:
                               ElevatedButton.styleFrom(
                             backgroundColor:
-                                const Color(
-                                    0xFF16A34A),
+                                theme.extension<AppStatusColors>()?.success ?? Colors.green,
                             foregroundColor:
-                                Colors.white,
+                                theme.colorScheme.onPrimary,
                           ),
                           onPressed: () async {
                             final alertId = docs[index].id;

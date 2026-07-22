@@ -21,16 +21,16 @@ class SettingsDestructiveTile extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: const Color(0xFFEF4444), size: 22),
+        child: Icon(icon, color: Theme.of(context).colorScheme.error, size: 22),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: Color(0xFFEF4444),
+          color: Theme.of(context).colorScheme.error,
         ),
       ),
       onTap: onTap,

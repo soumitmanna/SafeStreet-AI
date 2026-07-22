@@ -87,6 +87,7 @@ class _EmergencyContactFormSheetState extends State<EmergencyContactFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -104,10 +105,10 @@ class _EmergencyContactFormSheetState extends State<EmergencyContactFormSheet> {
             children: [
               Text(
                 widget.initialContact == null ? 'Add Emergency Contact' : 'Edit Contact',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 24),
@@ -116,18 +117,18 @@ class _EmergencyContactFormSheetState extends State<EmergencyContactFormSheet> {
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: theme.colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline_rounded, color: Colors.red.shade700, size: 20),
+                      Icon(Icons.error_outline_rounded, color: theme.colorScheme.error, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _errorMessage!,
-                          style: TextStyle(color: Colors.red.shade900, fontSize: 13),
+                          style: TextStyle(color: theme.colorScheme.error, fontSize: 13),
                         ),
                       ),
                     ],
@@ -214,7 +215,7 @@ class _EmergencyContactFormSheetState extends State<EmergencyContactFormSheet> {
                 value: _isPrimary,
                 onChanged: (val) => setState(() => _isPrimary = val),
                 contentPadding: EdgeInsets.zero,
-                activeTrackColor: const Color(0xFF3730A3),
+                activeTrackColor: theme.colorScheme.primary,
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -222,17 +223,17 @@ class _EmergencyContactFormSheetState extends State<EmergencyContactFormSheet> {
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.black54,
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    disabledBackgroundColor: theme.colorScheme.primary.withValues(alpha: 0.5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.onPrimary),
                         )
                       : const Text(
                           'Save Contact',

@@ -4,6 +4,7 @@ import '../controllers/edit_profile_controller.dart';
 import '../controllers/profile_controller.dart';
 import '../models/user_profile_model.dart';
 import '../services/profile_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/profile_avatar_widget.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -72,12 +73,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return PopScope(
           canPop: !isBusy,
           child: Scaffold(
-            backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Edit Profile'),
-              backgroundColor: Colors.white,
-              elevation: 0,
-              foregroundColor: Colors.black87,
               leading: IconButton(
                 icon: const Icon(Icons.close_rounded),
                 onPressed: isBusy ? null : _handleCancel,
@@ -89,20 +86,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildAvatarSection(state),
+                    _buildAvatarSection(context, state),
                     const SizedBox(height: 28),
-                    _buildFormSection(state),
+                    _buildFormSection(context, state),
                     const SizedBox(height: 28),
-                    _buildEmergencyInformationSection(state),
+                    _buildEmergencyInformationSection(context, state),
                     const SizedBox(height: 16),
                     if (isSaving)
                       const LinearProgressIndicator(),
                     if (state is EditProfileOffline)
-                      _buildOfflineBanner(),
+                      _buildOfflineBanner(context),
                     if (state is EditProfileError)
-                      _buildErrorBanner(state),
+                      _buildErrorBanner(context, state),
                     const SizedBox(height: 20),
-                    _buildActionButtons(isBusy, state),
+                    _buildActionButtons(context, isBusy, state),
                   ],
                 ),
               ),
@@ -113,7 +110,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildAvatarSection(EditProfileState state) {
+  Widget _buildAvatarSection(BuildContext context, EditProfileState state) {
+    final theme = Theme.of(context);
     final bool showRemovePhoto = widget.profile.hasAvatar && !_controller.removePhotoOnSave && _controller.previewFilePath == null;
 
     return Column(
@@ -131,10 +129,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               right: 0,
               child: GestureDetector(
                 onTap: () => _showImageSourceBottomSheet(context),
-                child: const CircleAvatar(
+                child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.black87,
-                  child: Icon(Icons.camera_alt_rounded, size: 18, color: Colors.white),
+                  backgroundColor: theme.colorScheme.onSurface,
+                  child: Icon(Icons.camera_alt_rounded, size: 18, color: theme.colorScheme.surface),
                 ),
               ),
             ),
@@ -145,17 +143,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: theme.extension<AppStatusColors>()?.info.withValues(alpha: 0.1) ?? theme.colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: Colors.blue, size: 18),
+                Icon(Icons.info_outline_rounded, color: theme.extension<AppStatusColors>()?.info ?? theme.colorScheme.primary, size: 18),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
                     "New photo selected. Tap 'Save Changes' to apply.",
-                    style: TextStyle(fontSize: 12, color: Colors.blue),
+                    style: TextStyle(fontSize: 12, color: theme.extension<AppStatusColors>()?.info ?? theme.colorScheme.primary),
                   ),
                 ),
                 TextButton(
@@ -173,7 +171,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         else if (showRemovePhoto)
           TextButton(
             onPressed: () => _showRemovePhotoConfirmation(context),
-            child: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+            child: Text('Remove Photo', style: TextStyle(color: theme.colorScheme.error)),
           ),
       ],
     );
@@ -234,14 +232,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Navigator.pop(context);
               _controller.markPhotoForRemoval();
             },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            child: Text('Remove', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFormSection(EditProfileState state) {
+  Widget _buildFormSection(BuildContext context, EditProfileState state) {
+    final theme = Theme.of(context);
     Map<String, String>? fieldErrors;
     if (state is EditProfileValidationError) {
       fieldErrors = state.fieldErrors;
@@ -250,19 +249,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Personal Information',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 24),
@@ -337,7 +336,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildEmergencyInformationSection(EditProfileState state) {
+  Widget _buildEmergencyInformationSection(BuildContext context, EditProfileState state) {
+    final theme = Theme.of(context);
     Map<String, String>? fieldErrors;
     if (state is EditProfileValidationError) {
       fieldErrors = state.fieldErrors;
@@ -346,19 +346,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Emergency Information',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 24),
@@ -384,22 +384,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildOfflineBanner() {
+  Widget _buildOfflineBanner(BuildContext context) {
+    final theme = Theme.of(context);
+    final warningColor = theme.extension<AppStatusColors>()?.warning ?? theme.colorScheme.error;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.amber.shade50,
+        color: warningColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.shade200),
+        border: Border.all(color: warningColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.wifi_off_rounded, color: Colors.amber.shade800),
+          Icon(Icons.wifi_off_rounded, color: warningColor),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               'No internet connection. Your changes will sync when you reconnect.',
-              style: TextStyle(color: Colors.amber.shade900),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
           ),
         ],
@@ -407,25 +409,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildErrorBanner(EditProfileError state) {
+  Widget _buildErrorBanner(BuildContext context, EditProfileError state) {
+    final theme = Theme.of(context);
+    final errorColor = theme.colorScheme.error;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
+        color: errorColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.shade200),
+        border: Border.all(color: errorColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.error_outline_rounded, color: Colors.red.shade800),
+              Icon(Icons.error_outline_rounded, color: errorColor),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   state.userMessage,
-                  style: TextStyle(color: Colors.red.shade900),
+                  style: TextStyle(color: theme.colorScheme.onSurface),
                 ),
               ),
             ],
@@ -443,7 +447,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildActionButtons(bool isBusy, EditProfileState state) {
+  Widget _buildActionButtons(BuildContext context, bool isBusy, EditProfileState state) {
+    final theme = Theme.of(context);
     final bool canSave = state is EditProfileIdle || state is EditProfileEditing || state is EditProfilePreviewing;
 
     return Column(
@@ -453,9 +458,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: ElevatedButton(
             onPressed: (canSave && !isBusy) ? _handleSave : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF000000),
-              disabledBackgroundColor: const Color(0xFF000000).withValues(alpha: 0.5),
-              disabledForegroundColor: Colors.white.withValues(alpha: 0.5),
+              backgroundColor: theme.colorScheme.primary,
+              disabledBackgroundColor: theme.colorScheme.primary.withValues(alpha: 0.5),
+              disabledForegroundColor: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
+              foregroundColor: theme.colorScheme.onPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -473,15 +479,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: OutlinedButton(
             onPressed: isBusy ? null : _handleCancel,
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.black12),
+              side: BorderSide(color: theme.dividerColor),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text(
+            child: Text(
               'Cancel',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),

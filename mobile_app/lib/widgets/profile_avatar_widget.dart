@@ -21,7 +21,7 @@ class ProfileAvatarWidget extends StatelessWidget {
     if (effectiveLocalPath != null) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: const Color(0xFFE0E7FF),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         child: ClipOval(
           child: Image.file(
             File(effectiveLocalPath),
@@ -29,7 +29,7 @@ class ProfileAvatarWidget extends StatelessWidget {
             height: radius * 2,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              return _buildInitialsOrIcon();
+              return _buildInitialsOrIcon(context);
             },
           ),
         ),
@@ -40,7 +40,7 @@ class ProfileAvatarWidget extends StatelessWidget {
     if (profile.photoURL != null && profile.photoURL!.isNotEmpty && (profile.photoURL!.startsWith('http://') || profile.photoURL!.startsWith('https://'))) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: const Color(0xFFE0E7FF),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         child: ClipOval(
           child: Image.network(
             profile.photoURL!,
@@ -55,28 +55,29 @@ class ProfileAvatarWidget extends StatelessWidget {
                         (loadingProgress.expectedTotalBytes ?? 1)
                     : null,
                 strokeWidth: 2,
-                color: const Color(0xFF3730A3),
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
               );
             },
             errorBuilder: (context, error, stackTrace) {
               // Priority 4: Error fallback to Priority 2 or 3
-              return _buildInitialsOrIcon();
+              return _buildInitialsOrIcon(context);
             },
           ),
         ),
       );
     }
 
-    return _buildInitialsOrIcon();
+    return _buildInitialsOrIcon(context);
   }
 
-  Widget _buildInitialsOrIcon() {
+  Widget _buildInitialsOrIcon(BuildContext context) {
     final initials = profile.initials;
     final bool hasValidInitials = initials != '?' && initials.isNotEmpty;
+    final theme = Theme.of(context);
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: const Color(0xFFE0E7FF),
+      backgroundColor: theme.colorScheme.primaryContainer,
       child: hasValidInitials
           // Priority 2: Initials
           ? Text(
@@ -84,14 +85,14 @@ class ProfileAvatarWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: radius * 0.8,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF3730A3),
+                color: theme.colorScheme.onPrimaryContainer,
               ),
             )
           // Priority 3: Default icon
           : Icon(
               Icons.person_rounded,
               size: radius * 1.2,
-              color: const Color(0xFF3730A3),
+              color: theme.colorScheme.onPrimaryContainer,
             ),
     );
   }

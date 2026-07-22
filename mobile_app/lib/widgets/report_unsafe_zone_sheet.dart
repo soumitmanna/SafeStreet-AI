@@ -139,8 +139,8 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -213,19 +213,19 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.black12,
+                color: Theme.of(context).dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
 
           // ── Title ──────────────────────────────────────────────────────────
-          const Text(
+          Text(
             'Report Unsafe Zone',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.darkText,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
 
@@ -236,19 +236,19 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
           // Shows a friendly label, not raw coordinates.
           // The actual LatLng is stored in widget.location and passed
           // to the service — never exposed in the UI.
-          const Row(
+          Row(
             children: [
               Icon(
                 Icons.location_on_rounded,
                 size: 16,
-                color: AppTheme.primaryBlue,
+                color: Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 6),
               Text(
                 'Selected location on map',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -257,12 +257,12 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
           const SizedBox(height: 20),
 
           // ── Category section ───────────────────────────────────────────────
-          const Text(
+          Text(
             'Category',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppTheme.darkText,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
 
@@ -285,10 +285,10 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
                           _selectedCategory = category;
                           _errorMessage = null;
                         }),
-                selectedColor: AppTheme.primaryBlue,
-                backgroundColor: Colors.white,
+                selectedColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppTheme.darkText,
+                  color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                   fontWeight:
                       isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -296,7 +296,7 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
                     color:
-                        isSelected ? AppTheme.primaryBlue : Colors.black12,
+                        isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
                   ),
                 ),
               );
@@ -306,12 +306,12 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
           const SizedBox(height: 20),
 
           // ── Description section ────────────────────────────────────────────
-          const Text(
+          Text(
             'Description',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppTheme.darkText,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
 
@@ -330,24 +330,24 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
             },
             decoration: InputDecoration(
               hintText: 'Describe the hazard...',
-              hintStyle: const TextStyle(color: Colors.black38),
+              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Colors.black12),
+                borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(
-                  color: AppTheme.primaryBlue,
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
                   width: 1.5,
                 ),
               ),
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Colors.black12),
+                borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               contentPadding: const EdgeInsets.all(14),
             ),
@@ -359,21 +359,21 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 1),
                   child: Icon(
                     Icons.error_outline_rounded,
                     size: 16,
-                    color: AppTheme.emergencyRed,
+                    color: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
                   ),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     _errorMessage!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppTheme.emergencyRed,
+                      color: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
                       height: 1.4,
                     ),
                   ),
@@ -390,19 +390,19 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitReport,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isSubmitting
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         strokeWidth: 2,
                       ),
                     )
@@ -424,9 +424,9 @@ class _ReportUnsafeZoneSheetState extends State<ReportUnsafeZoneSheet> {
             child: TextButton(
               onPressed:
                   _isSubmitting ? null : () => Navigator.of(context).pop(),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ),
           ),

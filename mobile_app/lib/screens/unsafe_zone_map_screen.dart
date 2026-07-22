@@ -159,7 +159,7 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
   Position? _lastKnownPosition;
 
   /// IDs of zones the user has already been warned about on this visit.
-  Set<String> _notifiedZoneIds = {};
+  final Set<String> _notifiedZoneIds = {};
 
   /// Threshold distance in metres for triggering an alert.
   static const double _kWarningRadiusMetres = 150.0;
@@ -434,17 +434,17 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
 
     final banner = MaterialBanner(
       elevation: 4,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      leading: const Icon(
+      leading: Icon(
         Icons.warning_amber_rounded,
-        color: AppTheme.emergencyRed,
+        color: Theme.of(context).extension<AppStatusColors>()?.warning ?? Colors.orange,
         size: 32,
       ),
       content: Text(
         'Nearby unsafe area\n${zoneCategoryLabel(zone.category)}  •  ~${distance.round()} m away',
-        style: const TextStyle(
-          color: Colors.black87,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
           height: 1.4,
         ),
@@ -621,8 +621,8 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
                     ElevatedButton(
                       onPressed: checkRisk,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         minimumSize: const Size.fromHeight(50),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -657,7 +657,7 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
             ],
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF22C55E), // green
+          backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green, // green
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -680,17 +680,17 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
               selected: _selectedCategories.isEmpty,
               onSelected: (_) => _onFilterChanged({}),
               showCheckmark: false,
-              backgroundColor: Colors.white,
-              selectedColor: AppTheme.primaryBlue.withOpacity(0.1),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               side: BorderSide(
                 color: _selectedCategories.isEmpty
-                    ? AppTheme.primaryBlue
-                    : Colors.grey.shade300,
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).dividerColor,
               ),
               labelStyle: TextStyle(
                 color: _selectedCategories.isEmpty
-                    ? AppTheme.primaryBlue
-                    : Colors.black87,
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: _selectedCategories.isEmpty
                     ? FontWeight.bold
                     : FontWeight.normal,
@@ -715,16 +715,16 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
                   }
                   _onFilterChanged(newSelection);
                 },
-                backgroundColor: Colors.white,
-                selectedColor: AppTheme.primaryBlue.withOpacity(0.1),
-                checkmarkColor: AppTheme.primaryBlue,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                  selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                checkmarkColor: Theme.of(context).colorScheme.primary,
                 side: BorderSide(
                   color: isSelected
-                      ? AppTheme.primaryBlue
-                      : Colors.grey.shade300,
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
                 labelStyle: TextStyle(
-                  color: isSelected ? AppTheme.primaryBlue : Colors.black87,
+                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -740,13 +740,8 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.lightBackground,
-
       appBar: AppBar(
         title: const Text('Community Map'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
 
       body: Stack(
@@ -781,13 +776,13 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
 
           // ── Loading indicator ──────────────────────────────────────────────
           if (_isLoadingLocation)
-            const Positioned(
+            Positioned(
               top: 60, // Shifted down for filter bar
               left: 0,
               right: 0,
               child: LinearProgressIndicator(
                 minHeight: 3,
-                color: AppTheme.primaryBlue,
+                color: Theme.of(context).colorScheme.primary,
                 backgroundColor: Colors.transparent,
               ),
             ),
@@ -847,7 +842,8 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
         children: [
           FloatingActionButton.extended(
             heroTag: 'prediction_fab',
-            backgroundColor: AppTheme.primaryBlue,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 4,
             onPressed: () {
               if (_lastKnownPosition != null) {
@@ -858,17 +854,16 @@ class _UnsafeZoneMapScreenState extends State<UnsafeZoneMapScreen> {
                 );
               }
             },
-            icon: const Icon(Icons.analytics_outlined, color: Colors.white),
-            label: const Text('Check Risk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.analytics_outlined),
+            label: const Text('Check Risk', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
-          FloatingActionButton.small(
-            heroTag: 'unsafe_zone_map_my_location_fab',
-            backgroundColor: Colors.white,
-            elevation: 4,
+          FloatingActionButton(
+            heroTag: 'myLocationBtn',
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             onPressed: _centerOnUserLocation,
-            tooltip: 'My location',
-            child: const Icon(Icons.my_location_rounded, color: AppTheme.primaryBlue),
+            child: const Icon(Icons.my_location_rounded),
           ),
         ],
       ),
@@ -893,28 +888,27 @@ class _LocationErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(16),
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.location_off_rounded,
-              color: Color(
-                0xFFFB923C,
-              ), // orange — consistent with alertStatusColor('active')
+              color: theme.extension<AppStatusColors>()?.warning ?? const Color(0xFFFB923C),
               size: 20,
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                   height: 1.4,
                 ),
               ),
@@ -922,10 +916,10 @@ class _LocationErrorBanner extends StatelessWidget {
             const SizedBox(width: 6),
             GestureDetector(
               onTap: onDismiss,
-              child: const Icon(
+              child: Icon(
                 Icons.close_rounded,
                 size: 18,
-                color: Colors.black38,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

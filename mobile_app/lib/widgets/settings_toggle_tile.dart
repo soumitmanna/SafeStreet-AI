@@ -28,13 +28,13 @@ class SettingsToggleTile extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           color: enabled 
-              ? const Color(0xFF2563EB).withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.05),
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+              : Theme.of(context).iconTheme.color?.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
           icon, 
-          color: enabled ? const Color(0xFF2563EB) : Colors.black38, 
+          color: enabled ? Theme.of(context).colorScheme.primary : Theme.of(context).iconTheme.color?.withValues(alpha: 0.38),
           size: 22,
         ),
       ),
@@ -42,14 +42,14 @@ class SettingsToggleTile extends StatelessWidget {
         title,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: enabled ? Colors.black87 : Colors.black38,
+          color: enabled ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.38),
         ),
       ),
       subtitle: subtitle != null
           ? Text(
               subtitle!,
               style: TextStyle(
-                color: enabled ? Colors.black54 : Colors.black26, 
+                color: enabled ? Theme.of(context).textTheme.bodyMedium?.color : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
                 fontSize: 13,
               ),
             )
@@ -57,7 +57,7 @@ class SettingsToggleTile extends StatelessWidget {
       trailing: Switch.adaptive(
         value: value,
         onChanged: enabled ? onChanged : null,
-        activeColor: const Color(0xFF2563EB),
+        activeTrackColor: Theme.of(context).colorScheme.primary,
       ),
       onTap: enabled ? () => onChanged(!value) : null,
     );

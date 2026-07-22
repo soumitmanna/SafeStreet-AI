@@ -7,6 +7,10 @@ import '../widgets/settings_toggle_tile.dart';
 import '../widgets/settings_destructive_tile.dart';
 import '../widgets/profile_avatar_widget.dart';
 import 'edit_profile_screen.dart';
+import 'appearance_screen.dart';
+import 'privacy_screen.dart';
+import 'security_screen.dart';
+import 'support_screen.dart';
 import 'login_screen.dart';
 import '../controllers/profile_controller.dart';
 
@@ -48,7 +52,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            child: Text('Logout', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -77,12 +81,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Account Settings'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: ListenableBuilder(
         listenable: _controller,
@@ -98,7 +99,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: 16),
                   Text(state.error.message, textAlign: TextAlign.center),
                   const SizedBox(height: 16),
@@ -119,9 +120,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 const SettingsSectionHeader(title: 'Account'),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardTheme.color,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black12),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   child: Column(
                     children: [
@@ -146,8 +147,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                                     const SizedBox(height: 4),
                                     Text(
                                       profile.email,
-                                      style: const TextStyle(
-                                        color: Colors.black54,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -178,6 +179,86 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                           }
                         },
                       ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+                const SettingsSectionHeader(title: 'Notifications'),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Theme.of(context).dividerColor),
+                  ),
+                  child: _buildNotificationSection(context, _controller.notificationState),
+                ),
+                const SettingsSectionHeader(title: 'Settings'),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Theme.of(context).dividerColor),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      SettingsTile(
+                        icon: Icons.palette_outlined,
+                        title: 'Appearance',
+                        subtitle: 'Theme and display settings',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AppearanceScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      SettingsTile(
+                        icon: Icons.lock_outline_rounded,
+                        title: 'Privacy',
+                        subtitle: 'Manage permissions and data',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacyScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      SettingsTile(
+                        icon: Icons.shield_outlined,
+                        title: 'Security',
+                        subtitle: 'Authentication and emergency features',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SecurityScreen(
+                                controller: _controller,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      SettingsTile(
+                        icon: Icons.help_outline_rounded,
+                        title: 'Support',
+                        subtitle: 'Help center and about',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SupportScreen(),
+                            ),
+                          );
+                        },
+                      ),
                       const Divider(height: 1, indent: 16, endIndent: 16),
                       SettingsDestructiveTile(
                         icon: Icons.logout_rounded,
@@ -188,17 +269,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     ],
                   ),
                 ),
-                if (state is AccountSettingsLoaded) ...[
-                  const SettingsSectionHeader(title: 'Notifications'),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: _buildNotificationSection(_controller.notificationState),
-                  ),
-                ],
+                const SizedBox(height: 24),
               ],
             );
           }
@@ -209,7 +280,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     );
   }
 
-  Widget _buildNotificationSection(AccountSettingsNotificationState notifState) {
+  Widget _buildNotificationSection(BuildContext context, AccountSettingsNotificationState notifState) {
     if (notifState is AccountSettingsNotificationLoading) {
       return const Padding(
         padding: EdgeInsets.all(24.0),
@@ -220,7 +291,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     if (notifState is AccountSettingsNotificationError) {
       return Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Center(child: Text(notifState.error, style: const TextStyle(color: Colors.red))),
+        child: Center(child: Text(notifState.error, style: TextStyle(color: Theme.of(context).colorScheme.error))),
       );
     }
     
@@ -243,15 +314,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             value: prefs.emergencyAlertEnabled,
             enabled: prefs.masterEnabled,
             onChanged: _controller.setEmergencyAlertNotifications,
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SettingsToggleTile(
-            icon: Icons.check_circle_rounded,
-            title: 'SOS Confirmation',
-            subtitle: 'Notify when SOS is received',
-            value: prefs.sosConfirmationEnabled,
-            enabled: prefs.masterEnabled,
-            onChanged: _controller.setSosConfirmationNotifications,
           ),
           const SizedBox(height: 8),
         ],

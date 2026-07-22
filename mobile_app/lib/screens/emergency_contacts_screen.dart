@@ -38,7 +38,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -64,14 +64,14 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black87)),
+            child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _controller.deleteContact(contact.id);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -80,8 +80,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: _isSearchVisible
             ? TextField(
@@ -94,9 +94,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                 style: const TextStyle(fontSize: 18),
               )
             : const Text('Emergency Contacts'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
         actions: [
           IconButton(
             icon: Icon(_isSearchVisible ? Icons.close_rounded : Icons.search_rounded),
@@ -136,8 +133,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
           }
           return FloatingActionButton.extended(
             onPressed: _controller.isBusy ? null : () => _showFormSheet(),
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
             icon: const Icon(Icons.add_rounded),
             label: const Text('Add Contact', style: TextStyle(fontWeight: FontWeight.bold)),
           );
@@ -150,8 +147,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
     switch (_controller.state) {
       case ContactsState.initial:
       case ContactsState.loading:
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.black),
+        return Center(
+          child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
         );
       
       case ContactsState.empty:
@@ -174,7 +171,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+              Icon(Icons.error_outline_rounded, size: 48, color: Theme.of(context).colorScheme.error),
               const SizedBox(height: 16),
               const Text('Failed to load contacts.'),
               const SizedBox(height: 16),
@@ -189,15 +186,16 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   }
 
   Widget _buildNoSearchResults() {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_rounded, size: 48, color: Colors.black26),
+          Icon(Icons.search_off_rounded, size: 48, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(
             'No contacts found for "${_controller.searchQuery}"',
-            style: const TextStyle(color: Colors.black54),
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
       ),
@@ -234,23 +232,24 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   }
 
   Widget _buildErrorBanner() {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.red.shade600,
+      color: theme.colorScheme.error,
       child: SafeArea(
         bottom: false,
         child: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+            Icon(Icons.error_outline_rounded, color: theme.colorScheme.onError, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 _controller.errorMessage!,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: theme.colorScheme.onError, fontSize: 14),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+              icon: Icon(Icons.close_rounded, color: theme.colorScheme.onError, size: 20),
               onPressed: _controller.clearError,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

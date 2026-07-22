@@ -21,14 +21,14 @@ class EmergencyContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.black.withAlpha(15)),
+        side: BorderSide(color: theme.dividerColor),
       ),
-      color: Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onCall,
@@ -36,7 +36,7 @@ class EmergencyContactCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              _buildAvatar(),
+              _buildAvatar(context),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -47,10 +47,10 @@ class EmergencyContactCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             contact.displayName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: theme.colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -58,7 +58,7 @@ class EmergencyContactCard extends StatelessWidget {
                         ),
                         if (contact.isPrimary) ...[
                           const SizedBox(width: 8),
-                          _buildPrimaryBadge(),
+                          _buildPrimaryBadge(context),
                         ],
                       ],
                     ),
@@ -67,9 +67,9 @@ class EmergencyContactCard extends StatelessWidget {
                       contact.relationship != null && contact.relationship!.isNotEmpty
                           ? '${contact.relationship} • ${contact.formattedPhone}'
                           : contact.formattedPhone,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black54,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -77,7 +77,7 @@ class EmergencyContactCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _buildPopupMenu(),
+              _buildPopupMenu(context),
             ],
           ),
         ),
@@ -85,39 +85,41 @@ class EmergencyContactCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(BuildContext context) {
+    final theme = Theme.of(context);
     return CircleAvatar(
       radius: 24,
-      backgroundColor: const Color(0xFFE0E7FF),
+      backgroundColor: theme.colorScheme.primaryContainer,
       child: Text(
         contact.initials,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF3730A3),
+          color: theme.colorScheme.onPrimaryContainer,
         ),
       ),
     );
   }
 
-  Widget _buildPrimaryBadge() {
+  Widget _buildPrimaryBadge(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFE0E7FF),
+        color: theme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(Icons.star_rounded, size: 12, color: Color(0xFF3730A3)),
-          SizedBox(width: 4),
+        children: [
+          Icon(Icons.star_rounded, size: 12, color: theme.colorScheme.onPrimaryContainer),
+          const SizedBox(width: 4),
           Text(
             'Primary',
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF3730A3),
+              color: theme.colorScheme.onPrimaryContainer,
             ),
           ),
         ],
@@ -125,9 +127,10 @@ class EmergencyContactCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPopupMenu() {
+  Widget _buildPopupMenu(BuildContext context) {
+    final theme = Theme.of(context);
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert_rounded, color: Colors.black54),
+      icon: Icon(Icons.more_vert_rounded, color: theme.colorScheme.onSurfaceVariant),
       onSelected: (value) {
         switch (value) {
           case 'call':
@@ -194,9 +197,9 @@ class EmergencyContactCard extends StatelessWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline_rounded, size: 20, color: Colors.red.shade700),
+              Icon(Icons.delete_outline_rounded, size: 20, color: theme.colorScheme.error),
               const SizedBox(width: 12),
-              Text('Delete Contact', style: TextStyle(color: Colors.red.shade700)),
+              Text('Delete Contact', style: TextStyle(color: theme.colorScheme.error)),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 // =============================================================
 // SafeStreet
-// Alert Details Screen  —  Phase 11.2
+// Alert Details Screen — Phase 12.4.5
 //
 // Opens when the user taps an alert card in AlertsScreen.
 //
@@ -32,6 +32,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/alert_model.dart';
 import '../services/alert_service.dart';
+import '../theme/app_theme.dart';
 import '../utils/alert_ui_helper.dart';
 import 'volunteer_assistance_screen.dart';
 
@@ -82,7 +83,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
           SnackBar(
             content: Text('Could not accept alert: $error'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFFDC2626),
+            backgroundColor: Theme.of(context).colorScheme.error,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -103,7 +104,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
           SnackBar(
             content: const Text('Could not open Google Maps.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFFDC2626),
+            backgroundColor: Theme.of(context).colorScheme.error,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -152,15 +153,11 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
     required AlertModel alert,
     required Widget body,
   }) {
-    final color = alertStatusColor(alert.status);
+    final color = alertStatusColor(context, alert.status);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Alert Details'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
         // Coloured status dot in the trailing so context is always visible
         actions: [
           Padding(
@@ -187,24 +184,25 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildErrorState() {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_rounded,
               size: 52,
-              color: Colors.black26,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
               "Couldn't load real-time updates. "
               "The data shown may be out of date.",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.black54,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                     height: 1.5,
                   ),
             ),
@@ -220,7 +218,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
 
   Widget _buildBody(BuildContext context, AlertModel alert) {
     final theme = Theme.of(context);
-    final color = alertStatusColor(alert.status);
+    final color = alertStatusColor(context, alert.status);
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
 
     // The alert is no longer active if it has been accepted or resolved.
@@ -303,7 +301,6 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                   alert.location,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
                     height: 1.2,
                   ),
                 ),
@@ -311,7 +308,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                 Text(
                   alertRelativeTime(alert.createdAt),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.black54,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -351,12 +348,12 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: theme.shadowColor.withValues(alpha: 0.03),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -369,7 +366,6 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
             'Alert Information',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 16),
@@ -418,10 +414,10 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 16, color: Colors.black54),
+            child: Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -431,7 +427,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                 Text(
                   label,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.black45,
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -442,11 +438,9 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                       ? theme.textTheme.bodyMedium?.copyWith(
                           fontFamily: 'monospace',
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
                         )
                       : theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
                         ),
                 ),
               ],
@@ -457,7 +451,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
     );
   }
 
-  Widget _buildDivider() => const Divider(height: 1, color: Colors.black12);
+  Widget _buildDivider() => Divider(height: 1, color: Theme.of(context).dividerColor);
 
   // ---------------------------------------------------------------------------
   // Resolution status card
@@ -502,7 +496,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.14),
+              color: color.withValues(alpha: 0.14),
               shape: BoxShape.circle,
             ),
             child: Icon(cardIcon, color: color, size: 20),
@@ -516,14 +510,13 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                   title,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.black54,
+                    color: theme.colorScheme.onSurfaceVariant,
                     height: 1.4,
                   ),
                 ),
@@ -540,13 +533,14 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildMapButton(AlertModel alert) {
+    final theme = Theme.of(context);
     return OutlinedButton.icon(
       onPressed: () => _openInMaps(alert.latitude, alert.longitude),
       icon: const Icon(Icons.map_rounded),
       label: const Text('Open in Google Maps'),
       style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF2563EB),
-        side: const BorderSide(color: Color(0xFF2563EB)),
+        foregroundColor: theme.colorScheme.primary,
+        side: BorderSide(color: theme.colorScheme.primary),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -565,6 +559,9 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
     required bool isStillActive,
     required bool acceptedByMe,
   }) {
+    final statusColors = theme.extension<AppStatusColors>();
+    final successColor = statusColors?.success ?? const Color(0xFF16A34A);
+
     // ── State 1: current user already accepted in this session ────────────
     if (acceptedByMe) {
       return Column(
@@ -574,23 +571,23 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
+              color: successColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFF86EFAC)),
+              border: Border.all(color: successColor.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle_rounded,
-                  color: Color(0xFF16A34A),
+                  color: successColor,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'You accepted this alert',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: const Color(0xFF16A34A),
+                    color: successColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -610,8 +607,8 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
             icon: const Icon(Icons.volunteer_activism_rounded),
             label: const Text('Continue to Assistance'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2563EB),
-              foregroundColor: Colors.white,
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
@@ -632,16 +629,16 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: theme.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(color: theme.dividerColor),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               alertStatusIcon(alert.status),
-              color: alertStatusColor(alert.status),
+              color: alertStatusColor(context, alert.status),
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -650,7 +647,7 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
                   ? 'Alert resolved'
                   : 'Already accepted by another responder',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: Colors.black54,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -663,20 +660,20 @@ class _AlertDetailsScreenState extends State<AlertDetailsScreen> {
     return ElevatedButton.icon(
       onPressed: _isAccepting ? null : () => _acceptAlert(alert.id),
       icon: _isAccepting
-          ? const SizedBox(
+          ? SizedBox(
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
               ),
             )
           : const Icon(Icons.volunteer_activism_rounded),
       label: Text(_isAccepting ? 'Accepting...' : 'Accept Alert'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF16A34A),
-        disabledBackgroundColor: const Color(0xFF16A34A).withValues(alpha: 0.6),
-        foregroundColor: Colors.white,
+        backgroundColor: successColor,
+        disabledBackgroundColor: successColor.withValues(alpha: 0.6),
+        foregroundColor: theme.colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),

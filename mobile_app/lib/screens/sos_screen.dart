@@ -10,6 +10,7 @@ import '../services/evidence_service.dart';
 import '../services/sos_service.dart';
 import 'assist_screen.dart';
 import 'emergency_contacts_screen.dart';
+import '../theme/app_theme.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -106,7 +107,7 @@ class _SosScreenState extends State<SosScreen> {
         snackMessage = 'SOS alert created successfully. No trusted contacts were available.';
       }
 
-      _showSnackBar(snackMessage, backgroundColor: const Color(0xFF16A34A));
+      _showSnackBar(snackMessage, backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green);
 
       await Future<void>.delayed(const Duration(milliseconds: 1200));
 
@@ -126,7 +127,7 @@ class _SosScreenState extends State<SosScreen> {
         _status = 'Ready to help';
       });
 
-      _showSnackBar(error.message, backgroundColor: const Color(0xFFDC2626));
+      _showSnackBar(error.message, backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red);
     } catch (error) {
       if (!mounted) return;
 
@@ -136,7 +137,7 @@ class _SosScreenState extends State<SosScreen> {
         _status = 'Ready to help';
       });
 
-      _showSnackBar('SOS failed: $error', backgroundColor: const Color(0xFFDC2626));
+      _showSnackBar('SOS failed: $error', backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red);
     }
   }
 
@@ -169,34 +170,36 @@ class _SosScreenState extends State<SosScreen> {
         _mapsLink = locationInfo.mapsLink;
       });
 
-      _showSnackBar('Location updated.', backgroundColor: const Color(0xFF16A34A));
+      _showSnackBar('Location updated.', backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green);
     } catch (error) {
       if (!mounted) return;
-      _showSnackBar(error.toString(), backgroundColor: const Color(0xFFDC2626));
+      _showSnackBar(error.toString(), backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red);
     }
   }
 
   Future<void> _openMapView() async {
     final mapsLink = _mapsLink;
     if (mapsLink == null || mapsLink.isEmpty) {
-      _showSnackBar('Location not available yet.', backgroundColor: const Color(0xFFDC2626));
+      _showSnackBar('Location not available yet.', backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red);
       return;
     }
 
     final uri = Uri.parse(mapsLink);
     if (!await launchUrl(uri)) {
-      _showSnackBar('Could not open maps.', backgroundColor: const Color(0xFFDC2626));
+      if (!mounted) return;
+      _showSnackBar('Could not open maps.', backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red);
     }
   }
 
   Future<EvidenceModel?> _requestEvidenceAttachment() async {
     while (mounted) {
+      if (!mounted) return null;
       final action = await showModalBottomSheet<_EvidenceOption>(
         context: context,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         builder: (context) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -209,9 +212,9 @@ class _SosScreenState extends State<SosScreen> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Adding a photo or short video may help responders understand your situation.',
-                  style: TextStyle(color: Colors.black54, height: 1.4),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, height: 1.4),
                 ),
                 const SizedBox(height: 22),
                 ElevatedButton.icon(
@@ -238,7 +241,7 @@ class _SosScreenState extends State<SosScreen> {
                   onPressed: () => Navigator.of(context).pop(_EvidenceOption.skip),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    side: const BorderSide(color: Colors.black12),
+                    side: BorderSide(color: Theme.of(context).dividerColor),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: const Text('Skip'),
@@ -253,7 +256,7 @@ class _SosScreenState extends State<SosScreen> {
         if (!mounted) return null;
         _showSnackBar(
           'Continuing without evidence.',
-          backgroundColor: const Color(0xFF2563EB),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         );
         return null;
       }
@@ -268,7 +271,6 @@ class _SosScreenState extends State<SosScreen> {
   }
 
   Future<EvidenceModel?> _captureEvidence(_EvidenceOption action) async {
-    final localContext = context;
     try {
       final EvidenceModel? evidence;
       if (action == _EvidenceOption.photo) {
@@ -289,8 +291,8 @@ class _SosScreenState extends State<SosScreen> {
         action == _EvidenceOption.photo
             ? 'Photo attached successfully.'
             : 'Video attached successfully.',
-        backgroundColor: const Color(0xFF16A34A),
-        context: localContext,
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
+        context: context,
       );
 
       return evidence;
@@ -298,8 +300,8 @@ class _SosScreenState extends State<SosScreen> {
       if (!mounted) return null;
       _showSnackBar(
         'Something went wrong while capturing evidence.',
-        backgroundColor: const Color(0xFFDC2626),
-        context: localContext,
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
+        context: context,
       );
       return null;
     }
@@ -323,12 +325,8 @@ class _SosScreenState extends State<SosScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Emergency SOS'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -370,13 +368,12 @@ class _SosScreenState extends State<SosScreen> {
           'Stay safe, stay ready',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'One tap alert for your trusted contacts and responders.',
-          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
       ],
     );
@@ -413,9 +410,9 @@ class _SosScreenState extends State<SosScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
         children: [
@@ -428,11 +425,11 @@ class _SosScreenState extends State<SosScreen> {
                   ? Image.file(
                       File(evidence.filePath),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image_outlined),
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image_outlined),
                     )
                   : Container(
-                      color: const Color(0xFFDBEAFE),
-                      child: const Icon(Icons.play_circle_fill, color: Color(0xFF2563EB), size: 30),
+                      color: theme.colorScheme.primaryContainer,
+                      child: Icon(Icons.play_circle_fill, color: theme.colorScheme.primary, size: 30),
                     ),
             ),
           ),
@@ -450,7 +447,7 @@ class _SosScreenState extends State<SosScreen> {
                   evidence.fileName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -472,13 +469,13 @@ class _SosScreenState extends State<SosScreen> {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFFEEDEE),
+        color: theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.1) ?? Colors.red.shade50,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
-          const BoxShadow(
-            color: Color.fromRGBO(244, 67, 54, 0.12),
+          BoxShadow(
+            color: theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.12) ?? const Color.fromRGBO(244, 67, 54, 0.12),
             blurRadius: 24,
-            offset: Offset(0, 12),
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -489,21 +486,21 @@ class _SosScreenState extends State<SosScreen> {
           child: ElevatedButton(
             onPressed: _isSending ? null : _confirmEmergency,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isSending ? const Color(0xFF991B1B) : const Color(0xFFDC2626),
-              disabledBackgroundColor: const Color(0xFF991B1B),
+              backgroundColor: _isSending ? theme.colorScheme.onSurfaceVariant : (theme.extension<AppStatusColors>()?.sos ?? Colors.red),
+              disabledBackgroundColor: theme.colorScheme.onSurfaceVariant,
               shape: const CircleBorder(),
               elevation: 8,
-              shadowColor: const Color.fromRGBO(255, 82, 82, 0.35),
+              shadowColor: theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.35) ?? const Color.fromRGBO(255, 82, 82, 0.35),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (_isSending)
-                  const SizedBox(
+                  SizedBox(
                     width: 46,
                     height: 46,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       strokeWidth: 5,
                     ),
                   )
@@ -511,7 +508,7 @@ class _SosScreenState extends State<SosScreen> {
                   Text(
                     'SOS',
                     style: theme.textTheme.displayMedium?.copyWith(
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -523,7 +520,7 @@ class _SosScreenState extends State<SosScreen> {
                           ? 'Alert active'
                           : 'Tap to send alert',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
+                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -548,20 +545,20 @@ class _SosScreenState extends State<SosScreen> {
           child: Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFFECFDF3),
+              color: theme.extension<AppStatusColors>()?.success.withValues(alpha: 0.1) ?? Colors.green.shade50,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFFBBF7D0)),
+              border: Border.all(color: theme.extension<AppStatusColors>()?.success.withValues(alpha: 0.3) ?? Colors.green.shade200),
             ),
             child: Row(
               children: [
                 Container(
                   width: 44,
                   height: 44,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF16A34A),
+                  decoration: BoxDecoration(
+                    color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.check_rounded, color: Colors.white),
+                  child: Icon(Icons.check_rounded, color: theme.colorScheme.onPrimary),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -571,7 +568,7 @@ class _SosScreenState extends State<SosScreen> {
                       Text(
                         'Alert Created',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: const Color(0xFF14532D),
+                          color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -581,7 +578,7 @@ class _SosScreenState extends State<SosScreen> {
                             ? 'SOS alert created with evidence attached.'
                             : 'SOS alert created successfully.',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF166534),
+                          color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                         ),
                       ),
                     ],
@@ -599,9 +596,9 @@ class _SosScreenState extends State<SosScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,12 +609,12 @@ class _SosScreenState extends State<SosScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: _emergencyActive ? const Color(0xFFFEF3F2) : const Color(0xFFEFF6FF),
+                  color: _emergencyActive ? (theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.1) ?? Colors.red.shade50) : theme.colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _emergencyActive ? Icons.warning_amber_rounded : Icons.health_and_safety_rounded,
-                  color: _emergencyActive ? const Color(0xFFB91C1C) : const Color(0xFF1D4ED8),
+                  color: _emergencyActive ? (theme.extension<AppStatusColors>()?.sos ?? Colors.red) : theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 14),
@@ -632,12 +629,12 @@ class _SosScreenState extends State<SosScreen> {
           const SizedBox(height: 18),
           Text(
             'Current emergency state, alerts sent to your saved contacts, and estimated response readiness.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54, height: 1.5),
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.5),
           ),
           const SizedBox(height: 22),
-          _buildStatusDetail('Firestore alert', _emergencyActive ? 'Created' : 'Not sent'),
+          _buildStatusDetail(theme, 'Firestore alert', _emergencyActive ? 'Created' : 'Not sent'),
           const SizedBox(height: 14),
-          _buildStatusDetail(
+          _buildStatusDetail(theme,
             'Response status',
             _isSending
                 ? 'Getting location'
@@ -646,17 +643,17 @@ class _SosScreenState extends State<SosScreen> {
                     : 'Ready to activate',
           ),
           const SizedBox(height: 14),
-          _buildStatusDetail('Last update', 'Just now'),
+          _buildStatusDetail(theme, 'Last update', 'Just now'),
         ],
       ),
     );
   }
 
-  Widget _buildStatusDetail(String title, String value) {
+  Widget _buildStatusDetail(ThemeData theme, String title, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: const TextStyle(color: Colors.black54)),
+        Text(title, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
       ],
     );
@@ -666,16 +663,16 @@ class _SosScreenState extends State<SosScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.location_on, color: Color(0xFFEF4444)),
+              Icon(Icons.location_on, color: theme.extension<AppStatusColors>()?.sos ?? Colors.red),
               const SizedBox(width: 10),
               Text('Live location', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             ],
@@ -683,7 +680,7 @@ class _SosScreenState extends State<SosScreen> {
           const SizedBox(height: 16),
           Text(
             'Latitude / Longitude',
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 6),
           Text(
@@ -699,7 +696,8 @@ class _SosScreenState extends State<SosScreen> {
                   icon: const Icon(Icons.refresh),
                   label: const Text('Refresh location'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1D4ED8),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
@@ -709,7 +707,7 @@ class _SosScreenState extends State<SosScreen> {
                 onPressed: _openMapView,
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  side: const BorderSide(color: Colors.black12),
+                  side: BorderSide(color: theme.dividerColor),
                 ),
                 child: const Text('Map view'),
               ),
@@ -726,16 +724,16 @@ class _SosScreenState extends State<SosScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.person_pin_circle_rounded, color: Color(0xFF0F172A)),
+              Icon(Icons.person_pin_circle_rounded, color: theme.colorScheme.onSurface),
               const SizedBox(width: 10),
               Text('Emergency contacts', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             ],
@@ -762,10 +760,10 @@ class _SosScreenState extends State<SosScreen> {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: const Color(0xFFDBEAFE),
+                      backgroundColor: theme.colorScheme.primaryContainer,
                       child: Text(
                         contact.initials,
-                        style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w700),
+                        style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.w700),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -784,12 +782,12 @@ class _SosScreenState extends State<SosScreen> {
                               ),
                               if (contact.isPrimary) ...[
                                 const SizedBox(width: 6),
-                                const Icon(Icons.star_rounded, size: 14, color: Color(0xFF1D4ED8)),
+                                Icon(Icons.star_rounded, size: 14, color: theme.colorScheme.primary),
                               ],
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(relation.isEmpty ? 'Trusted contact' : relation, style: const TextStyle(color: Colors.black54)),
+                          Text(relation.isEmpty ? 'Trusted contact' : relation, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -797,7 +795,7 @@ class _SosScreenState extends State<SosScreen> {
                       onPressed: () {
                         _contactService.smsContact(contact).catchError((_) {});
                       },
-                      icon: const Icon(Icons.message_rounded, color: Color(0xFF2563EB)),
+                      icon: Icon(Icons.message_rounded, color: theme.colorScheme.primary),
                     ),
                   ],
                 ),
@@ -812,7 +810,8 @@ class _SosScreenState extends State<SosScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: Theme.of(context).colorScheme.onSurface,
+              foregroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             child: const Padding(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/prediction_response.dart';
 import '../models/prediction_exception.dart';
+import '../models/prediction_response.dart';
 import '../utils/prediction_ui_helper.dart';
-import '../theme/app_theme.dart';
+
 
 class PredictionResultCard extends StatelessWidget {
   final PredictionResponse? result;
@@ -52,7 +52,7 @@ class PredictionResultCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: AppTheme.emergencyRed, size: 48),
+            Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error, size: 48),
             const SizedBox(height: 12),
             Text(
               PredictionUiHelper.messageFor(error!.type),

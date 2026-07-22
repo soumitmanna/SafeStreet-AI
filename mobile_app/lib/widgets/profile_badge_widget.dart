@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class _BadgeVisual {
   final String label;
@@ -13,20 +14,47 @@ class _BadgeVisual {
 }
 
 class _BadgeResolver {
-  static _BadgeVisual resolve(String id) {
+  static _BadgeVisual resolve(BuildContext context, String id) {
+    final theme = Theme.of(context);
+    final statusColors = theme.extension<AppStatusColors>();
+    
     switch (id) {
       case 'verified':
-        return const _BadgeVisual(label: 'Verified', backgroundColor: Color(0xFFDCFCE7), textColor: Color(0xFF166534));
+        return _BadgeVisual(
+          label: 'Verified',
+          backgroundColor: statusColors?.success.withValues(alpha: 0.1) ?? const Color(0xFFDCFCE7),
+          textColor: statusColors?.success ?? const Color(0xFF166534),
+        );
       case 'premium':
-        return const _BadgeVisual(label: 'Premium', backgroundColor: Color(0xFFEDE9FE), textColor: Color(0xFF5B21B6));
+        return _BadgeVisual(
+          label: 'Premium',
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+          textColor: theme.colorScheme.primary,
+        );
       case 'priority':
-        return const _BadgeVisual(label: 'Priority', backgroundColor: Color(0xFFFEF3C7), textColor: Color(0xFF92400E));
+        return _BadgeVisual(
+          label: 'Priority',
+          backgroundColor: statusColors?.warning.withValues(alpha: 0.1) ?? const Color(0xFFFEF3C7),
+          textColor: statusColors?.warning ?? const Color(0xFF92400E),
+        );
       case 'volunteer':
-        return const _BadgeVisual(label: 'Volunteer', backgroundColor: Color(0xFFDBEAFE), textColor: Color(0xFF1E40AF));
+        return _BadgeVisual(
+          label: 'Volunteer',
+          backgroundColor: statusColors?.info.withValues(alpha: 0.1) ?? const Color(0xFFDBEAFE),
+          textColor: statusColors?.info ?? const Color(0xFF1E40AF),
+        );
       case 'administrator':
-        return const _BadgeVisual(label: 'Admin', backgroundColor: Color(0xFFFEE2E2), textColor: Color(0xFF991B1B));
+        return _BadgeVisual(
+          label: 'Admin',
+          backgroundColor: theme.colorScheme.error.withValues(alpha: 0.1),
+          textColor: theme.colorScheme.error,
+        );
       default:
-        return _BadgeVisual(label: id, backgroundColor: const Color(0xFFF3F4F6), textColor: const Color(0xFF374151));
+        return _BadgeVisual(
+          label: id,
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          textColor: theme.colorScheme.onSurfaceVariant,
+        );
     }
   }
 }
@@ -41,7 +69,7 @@ class ProfileBadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visual = _BadgeResolver.resolve(badgeId);
+    final visual = _BadgeResolver.resolve(context, badgeId);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

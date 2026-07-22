@@ -3,15 +3,17 @@ import '../models/prediction_response.dart';
 import '../models/prediction_exception.dart';
 import '../theme/app_theme.dart';
 
+
 class PredictionUiHelper {
   static Color colorFor(BuildContext context, RiskLevel level) {
+    final statusColors = Theme.of(context).extension<AppStatusColors>();
     switch (level) {
       case RiskLevel.low:
-        return Colors.green;
+        return statusColors?.success ?? Colors.green;
       case RiskLevel.medium:
-        return Colors.orange;
+        return statusColors?.warning ?? Colors.orange;
       case RiskLevel.high:
-        return AppTheme.emergencyRed;
+        return statusColors?.sos ?? Colors.red;
       case RiskLevel.unknown:
         return Theme.of(context).disabledColor;
     }

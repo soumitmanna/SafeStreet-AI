@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -22,12 +23,8 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('AI Camera'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -39,13 +36,15 @@ class _CameraScreenState extends State<CameraScreen> {
                 'AI Safety Detection',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Use AI to identify potential safety threats in real-time.',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54, height: 1.4),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant, 
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 24),
               _buildCameraPreview(theme),
@@ -67,9 +66,9 @@ class _CameraScreenState extends State<CameraScreen> {
     return Container(
       height: 300,
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F4F8),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -80,12 +79,12 @@ class _CameraScreenState extends State<CameraScreen> {
               Icon(
                 Icons.videocam_rounded,
                 size: 64,
-                color: Colors.black26,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 12),
               Text(
                 'Camera preview',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -96,19 +95,19 @@ class _CameraScreenState extends State<CameraScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3F2),
+                  color: theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.1) ?? Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                  border: Border.all(color: theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.3) ?? Colors.red.shade200),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       width: 8,
                       height: 8,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation(Color(0xFFDC2626)),
+                        valueColor: AlwaysStoppedAnimation(theme.extension<AppStatusColors>()?.sos ?? Colors.red),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -116,7 +115,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       'LIVE',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFFDC2626),
+                        color: theme.extension<AppStatusColors>()?.sos ?? Colors.red,
                       ),
                     ),
                   ],
@@ -132,9 +131,9 @@ class _CameraScreenState extends State<CameraScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,12 +144,12 @@ class _CameraScreenState extends State<CameraScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: _isScanning ? const Color(0xFFFEF3F2) : const Color(0xFFEFF6FF),
+                  color: _isScanning ? (theme.extension<AppStatusColors>()?.sos.withValues(alpha: 0.1) ?? Colors.red.shade50) : theme.colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _isScanning ? Icons.radar_rounded : Icons.check_circle_rounded,
-                  color: _isScanning ? const Color(0xFFB91C1C) : const Color(0xFF1D4ED8),
+                  color: _isScanning ? (theme.extension<AppStatusColors>()?.sos ?? Colors.red) : theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 14),
@@ -166,9 +165,9 @@ class _CameraScreenState extends State<CameraScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: theme.dividerColor),
             ),
             child: Text(
               _detectionStatus,
@@ -179,9 +178,9 @@ class _CameraScreenState extends State<CameraScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStatusMetric('Threats found', '0', const Color(0xFFEF4444)),
-              _buildStatusMetric('Objects', '3', const Color(0xFF3B82F6)),
-              _buildStatusMetric('Confidence', '94%', const Color(0xFF22C55E)),
+              _buildStatusMetric(theme, 'Threats found', '0', theme.extension<AppStatusColors>()?.sos ?? Colors.red),
+              _buildStatusMetric(theme, 'Objects', '3', theme.colorScheme.primary),
+              _buildStatusMetric(theme, 'Confidence', '94%', theme.extension<AppStatusColors>()?.success ?? Colors.green),
             ],
           ),
         ],
@@ -189,7 +188,7 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Widget _buildStatusMetric(String label, String value, Color color) {
+  Widget _buildStatusMetric(ThemeData theme, String label, String value, Color color) {
     return Column(
       children: [
         Text(
@@ -203,7 +202,7 @@ class _CameraScreenState extends State<CameraScreen> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
+          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
         ),
       ],
     );
@@ -213,7 +212,8 @@ class _CameraScreenState extends State<CameraScreen> {
     return ElevatedButton(
       onPressed: _toggleScan,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF0EA5E9),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         padding: const EdgeInsets.symmetric(vertical: 16),
         elevation: 4,
@@ -234,19 +234,19 @@ class _CameraScreenState extends State<CameraScreen> {
         'icon': Icons.person_rounded,
         'label': 'Person detected',
         'time': 'Just now',
-        'color': Color(0xFF3B82F6),
+        'color': theme.colorScheme.primary,
       },
       {
         'icon': Icons.directions_car_rounded,
         'label': 'Vehicle detected',
         'time': '2 min ago',
-        'color': Color(0xFFFB923C),
+        'color': theme.extension<AppStatusColors>()?.warning ?? Colors.orange,
       },
       {
         'icon': Icons.location_on_rounded,
         'label': 'Unusual activity',
         'time': '5 min ago',
-        'color': Color(0xFFEF4444),
+        'color': theme.extension<AppStatusColors>()?.sos ?? Colors.red,
       },
     ];
 
@@ -260,9 +260,9 @@ class _CameraScreenState extends State<CameraScreen> {
         const SizedBox(height: 14),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFFAFAFA),
+            color: theme.colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: theme.dividerColor),
           ),
           child: Column(
             children: detections
@@ -275,7 +275,7 @@ class _CameraScreenState extends State<CameraScreen> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: (detection['color'] as Color).withOpacity(0.12),
+                            color: (detection['color'] as Color).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -295,7 +295,7 @@ class _CameraScreenState extends State<CameraScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 detection['time'] as String,
-                                style: const TextStyle(color: Colors.black54, fontSize: 12),
+                                style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                               ),
                             ],
                           ),
@@ -303,9 +303,9 @@ class _CameraScreenState extends State<CameraScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.black12),
+                            border: Border.all(color: theme.dividerColor),
                           ),
                           child: Text(
                             'Review',

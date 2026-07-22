@@ -38,6 +38,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/alert_model.dart';
 import '../services/alert_service.dart';
 import '../services/location_service.dart';
+import '../theme/app_theme.dart';
 import '../utils/alert_ui_helper.dart';
 
 class VolunteerAssistanceScreen extends StatefulWidget {
@@ -131,7 +132,7 @@ class _VolunteerAssistanceScreenState
       if (!mounted) return;
       _showSnackBar(
         'Could not open Google Maps.',
-        backgroundColor: const Color(0xFFDC2626),
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
       );
     }
   }
@@ -152,7 +153,7 @@ class _VolunteerAssistanceScreenState
       setState(() => _isMarkingArrived = false);
       _showSnackBar(
         'Could not mark arrival: $error',
-        backgroundColor: const Color(0xFFDC2626),
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
       );
     }
   }
@@ -179,8 +180,8 @@ class _VolunteerAssistanceScreenState
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF16A34A),
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -206,7 +207,7 @@ class _VolunteerAssistanceScreenState
       setState(() => _isResolving = false);
       _showSnackBar(
         'Could not resolve alert: $error',
-        backgroundColor: const Color(0xFFDC2626),
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red,
       );
     }
   }
@@ -261,15 +262,11 @@ class _VolunteerAssistanceScreenState
   // ---------------------------------------------------------------------------
 
   Widget _buildScaffold({required AlertModel alert, required Widget body}) {
-    final color = alertStatusColor(alert.status);
+    final statusColor = alertStatusColor(context, alert.status);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Volunteer Assistance'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -278,7 +275,7 @@ class _VolunteerAssistanceScreenState
                 width: 10,
                 height: 10,
                 decoration: BoxDecoration(
-                  color: color,
+                  color: statusColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -301,10 +298,10 @@ class _VolunteerAssistanceScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_rounded,
               size: 52,
-              color: Colors.black26,
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -312,7 +309,7 @@ class _VolunteerAssistanceScreenState
               "The data shown may be out of date.",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.black54,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.5,
                   ),
             ),
@@ -328,7 +325,7 @@ class _VolunteerAssistanceScreenState
 
   Widget _buildBody(BuildContext context, AlertModel alert) {
     final theme = Theme.of(context);
-    final color = alertStatusColor(alert.status);
+    final color = alertStatusColor(context, alert.status);
     final isResolved = alert.status == 'resolved';
 
     return SingleChildScrollView(
@@ -399,7 +396,7 @@ class _VolunteerAssistanceScreenState
                   alert.location,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                     height: 1.2,
                   ),
                 ),
@@ -407,7 +404,7 @@ class _VolunteerAssistanceScreenState
                 Text(
                   alertRelativeTime(alert.createdAt),
                   style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: Colors.black54),
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -445,12 +442,12 @@ class _VolunteerAssistanceScreenState
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: theme.shadowColor.withValues(alpha: 0.03),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -463,7 +460,7 @@ class _VolunteerAssistanceScreenState
             'Alert Information',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
@@ -512,10 +509,10 @@ class _VolunteerAssistanceScreenState
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 16, color: Colors.black54),
+            child: Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -525,7 +522,7 @@ class _VolunteerAssistanceScreenState
                 Text(
                   label,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.black45,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -536,11 +533,11 @@ class _VolunteerAssistanceScreenState
                       ? theme.textTheme.bodyMedium?.copyWith(
                           fontFamily: 'monospace',
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface,
                         )
                       : theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface,
                         ),
                 ),
               ],
@@ -551,7 +548,7 @@ class _VolunteerAssistanceScreenState
     );
   }
 
-  Widget _buildDivider() => const Divider(height: 1, color: Colors.black12);
+  Widget _buildDivider() => Divider(height: 1, color: Theme.of(context).dividerColor);
 
   // ---------------------------------------------------------------------------
   // Volunteer status card
@@ -576,17 +573,17 @@ class _VolunteerAssistanceScreenState
       title = 'Incident Resolved';
       subtitle = 'The alert has been successfully closed.';
       cardIcon = Icons.check_circle_rounded;
-      cardColor = const Color(0xFF22C55E);
+      cardColor = theme.extension<AppStatusColors>()?.success ?? Colors.green;
     } else if (hasArrived) {
       title = 'Arrived at Location';
       subtitle = alertFormattedTimestamp(alert.arrivedAt);
       cardIcon = Icons.location_on_rounded;
-      cardColor = const Color(0xFF3B82F6);
+      cardColor = theme.colorScheme.primary;
     } else {
       title = 'En Route';
       subtitle = 'Heading to the victim\'s location.';
       cardIcon = Icons.directions_run_rounded;
-      cardColor = const Color(0xFFFB923C);
+      cardColor = theme.extension<AppStatusColors>()?.warning ?? Colors.orange;
     }
 
     return Container(
@@ -616,14 +613,14 @@ class _VolunteerAssistanceScreenState
                   title,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.black54,
+                    color: theme.colorScheme.onSurfaceVariant,
                     height: 1.4,
                   ),
                 ),
@@ -656,9 +653,9 @@ class _VolunteerAssistanceScreenState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
         children: [
@@ -666,12 +663,12 @@ class _VolunteerAssistanceScreenState
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF6FF),
+              color: theme.colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.straighten_rounded,
-              color: Color(0xFF2563EB),
+              color: theme.colorScheme.primary,
               size: 20,
             ),
           ),
@@ -683,7 +680,7 @@ class _VolunteerAssistanceScreenState
                 Text(
                   'Distance to victim',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.black45,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -698,7 +695,7 @@ class _VolunteerAssistanceScreenState
                         distanceLabel,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
               ],
@@ -710,7 +707,7 @@ class _VolunteerAssistanceScreenState
             icon: const Icon(Icons.refresh_rounded, size: 16),
             label: const Text('Refresh'),
             style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF2563EB),
+              foregroundColor: theme.colorScheme.primary,
               textStyle: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -727,13 +724,14 @@ class _VolunteerAssistanceScreenState
   // ---------------------------------------------------------------------------
 
   Widget _buildNavigationButton(AlertModel alert) {
+    final theme = Theme.of(context);
     return OutlinedButton.icon(
       onPressed: () => _openNavigation(alert.latitude, alert.longitude),
       icon: const Icon(Icons.navigation_rounded),
       label: const Text('Open Navigation'),
       style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF2563EB),
-        side: const BorderSide(color: Color(0xFF2563EB)),
+        foregroundColor: theme.colorScheme.primary,
+        side: BorderSide(color: theme.colorScheme.primary),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -754,23 +752,23 @@ class _VolunteerAssistanceScreenState
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFFEFF6FF),
+          color: theme.colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFBFDBFE)),
+          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.location_on_rounded,
-              color: Color(0xFF2563EB),
+              color: theme.colorScheme.primary,
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               'Arrived at location',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: const Color(0xFF1D4ED8),
+                color: theme.colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -794,10 +792,10 @@ class _VolunteerAssistanceScreenState
           : const Icon(Icons.location_on_rounded),
       label: Text(_isMarkingArrived ? 'Marking…' : 'Mark Arrived'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF2563EB),
+        backgroundColor: theme.colorScheme.primary,
         disabledBackgroundColor:
-            const Color(0xFF2563EB).withValues(alpha: 0.6),
-        foregroundColor: Colors.white,
+            theme.colorScheme.primary.withValues(alpha: 0.6),
+        foregroundColor: theme.colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -826,10 +824,10 @@ class _VolunteerAssistanceScreenState
           : const Icon(Icons.check_circle_rounded),
       label: Text(_isResolving ? 'Resolving…' : 'Resolve Assistance'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF16A34A),
+        backgroundColor: Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green,
         disabledBackgroundColor:
-            const Color(0xFF16A34A).withValues(alpha: 0.6),
-        foregroundColor: Colors.white,
+            (Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green).withValues(alpha: 0.6),
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -851,15 +849,15 @@ class _VolunteerAssistanceScreenState
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFECFDF5),
+        color: theme.extension<AppStatusColors>()?.success.withValues(alpha: 0.1) ?? Colors.green.shade50,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF86EFAC)),
+        border: Border.all(color: theme.extension<AppStatusColors>()?.success.withValues(alpha: 0.3) ?? Colors.green.shade200),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.check_circle_rounded,
-            color: Color(0xFF16A34A),
+            color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
             size: 32,
           ),
           const SizedBox(width: 14),
@@ -870,7 +868,7 @@ class _VolunteerAssistanceScreenState
                 Text(
                   'Alert Resolved',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFF14532D),
+                    color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -878,7 +876,7 @@ class _VolunteerAssistanceScreenState
                 Text(
                   'This incident has been successfully closed.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF166534),
+                    color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                     height: 1.4,
                   ),
                 ),

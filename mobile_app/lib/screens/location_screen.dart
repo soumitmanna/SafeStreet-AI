@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -23,12 +24,8 @@ class _LocationScreenState extends State<LocationScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Live Location'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -40,13 +37,15 @@ class _LocationScreenState extends State<LocationScreen> {
                 'Share your location',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Keep your trusted contacts informed of your real-time location.',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54, height: 1.4),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant, 
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 24),
               _buildMapCard(theme),
@@ -68,9 +67,9 @@ class _LocationScreenState extends State<LocationScreen> {
     return Container(
       height: 280,
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F4F8),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -81,12 +80,12 @@ class _LocationScreenState extends State<LocationScreen> {
               Icon(
                 Icons.map_rounded,
                 size: 64,
-                color: Colors.black26,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 12),
               Text(
                 'Map preview',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -96,22 +95,22 @@ class _LocationScreenState extends State<LocationScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.black12),
+                border: Border.all(color: theme.dividerColor),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: theme.shadowColor.withValues(alpha: 0.08),
                     blurRadius: 12,
                   ),
                 ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.gps_fixed, size: 16, color: Color(0xFF0EA5E9)),
-                  SizedBox(width: 8),
-                  Text(
+                children: [
+                  Icon(Icons.gps_fixed, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  const Text(
                     'Live',
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                   ),
@@ -126,19 +125,19 @@ class _LocationScreenState extends State<LocationScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.black12),
+                border: Border.all(color: theme.dividerColor),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 12,
                   ),
                 ],
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.location_on, size: 18, color: Color(0xFFEF4444)),
+                  Icon(Icons.location_on, size: 18, color: theme.extension<AppStatusColors>()?.sos ?? Colors.red),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -160,9 +159,9 @@ class _LocationScreenState extends State<LocationScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,12 +172,12 @@ class _LocationScreenState extends State<LocationScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0F2FE),
+                  color: theme.colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.pin_drop_rounded,
-                  color: Color(0xFF0369A1),
+                  color: theme.colorScheme.onPrimaryContainer,
                 ),
               ),
               const SizedBox(width: 14),
@@ -203,7 +202,8 @@ class _LocationScreenState extends State<LocationScreen> {
                   icon: const Icon(Icons.refresh),
                   label: const Text('Update'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1D4ED8),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
@@ -215,7 +215,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 label: const Text('Copy'),
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  side: const BorderSide(color: Colors.black12),
+                  side: BorderSide(color: theme.dividerColor),
                 ),
               ),
             ],
@@ -229,7 +229,7 @@ class _LocationScreenState extends State<LocationScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
       ],
     );
@@ -241,7 +241,8 @@ class _LocationScreenState extends State<LocationScreen> {
       icon: Icon(_isSharing ? Icons.stop_circle_rounded : Icons.share_location_rounded),
       label: Text(_isSharing ? 'Stop sharing' : 'Share location'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: _isSharing ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
+        backgroundColor: _isSharing ? (Theme.of(context).extension<AppStatusColors>()?.sos ?? Colors.red) : (Theme.of(context).extension<AppStatusColors>()?.success ?? Colors.green),
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         padding: const EdgeInsets.symmetric(vertical: 16),
         elevation: 4,
@@ -266,9 +267,9 @@ class _LocationScreenState extends State<LocationScreen> {
         const SizedBox(height: 14),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFFAFAFA),
+            color: theme.colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: theme.dividerColor),
           ),
           child: Column(
             children: contacts
@@ -279,11 +280,11 @@ class _LocationScreenState extends State<LocationScreen> {
                       children: [
                         CircleAvatar(
                           radius: 22,
-                          backgroundColor: const Color(0xFFDBEAFE),
+                          backgroundColor: theme.colorScheme.primaryContainer,
                           child: Text(
                             contact['name']!.split(' ').map((word) => word[0]).take(2).join(),
-                            style: const TextStyle(
-                              color: Color(0xFF1D4ED8),
+                            style: TextStyle(
+                              color: theme.colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.w700,
                               fontSize: 12,
                             ),
@@ -303,21 +304,21 @@ class _LocationScreenState extends State<LocationScreen> {
                                 children: [
                                   Text(
                                     contact['role'] as String,
-                                    style: const TextStyle(color: Colors.black54, fontSize: 12),
+                                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
                                     width: 6,
                                     height: 6,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black54,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.onSurfaceVariant,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     contact['status'] as String,
-                                    style: const TextStyle(color: Colors.black54, fontSize: 12),
+                                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -327,8 +328,8 @@ class _LocationScreenState extends State<LocationScreen> {
                         Container(
                           width: 8,
                           height: 8,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF22C55E),
+                          decoration: BoxDecoration(
+                            color: theme.extension<AppStatusColors>()?.success ?? Colors.green,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -343,7 +344,8 @@ class _LocationScreenState extends State<LocationScreen> {
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
+            backgroundColor: theme.colorScheme.onSurface,
+            foregroundColor: theme.colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
           child: const Padding(

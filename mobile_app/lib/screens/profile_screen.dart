@@ -36,12 +36,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -90,9 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: _buildHeaderContent(theme, state),
     );
@@ -110,12 +107,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case ProfileEmpty():
         return Column(
           children: [
-            const Icon(Icons.person_outline, size: 48, color: Colors.black38),
+            const Icon(Icons.person_outline, size: 48),
             const SizedBox(height: 12),
             Text(
               'Incomplete profile',
               style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.black54,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -125,12 +121,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case ProfileError(:final userMessage):
         return Column(
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+            Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
             const SizedBox(height: 12),
             Text(
               userMessage,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black87),
+              style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -145,9 +141,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildLoadingSkeleton(ThemeData theme) {
     return Row(
       children: [
-        const CircleAvatar(
+        CircleAvatar(
           radius: 40,
-          backgroundColor: Color(0xFFE2E8F0),
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
         ),
         const SizedBox(width: 18),
         Expanded(
@@ -158,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 120,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE2E8F0),
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -167,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 180,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE2E8F0),
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -178,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: 70,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2E8F0),
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
@@ -187,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: 70,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2E8F0),
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
@@ -215,7 +211,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: Colors.black87,
                 ),
               ),
               if (profile.email.isNotEmpty) ...[
@@ -224,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   profile.email,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
               ],
               if (profile.hasBadges) ...[
@@ -239,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit_outlined, color: Colors.black54),
+          icon: const Icon(Icons.edit_outlined),
           onPressed: () async {
             final result = await Navigator.push(
               context,
@@ -270,9 +265,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 14),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: StreamBuilder<List<EmergencyContactModel>>(
             stream: _contactService.streamContacts(),
@@ -291,16 +286,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
               final contacts = snapshot.data ?? [];
               if (contacts.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Center(child: Text('No contacts added', style: TextStyle(color: Colors.black54))),
+                return Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(child: Text('No contacts added', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color))),
                 );
               }
               return Column(
                 children: List.generate(contacts.length, (index) {
                   final contact = contacts[index];
                   final isLast = index == contacts.length - 1;
-                  return _buildContactRow(context, contact, isLast);
+                  return _buildContactRow(context, theme, contact, isLast);
                 }),
               );
             },
@@ -310,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildContactRow(BuildContext context, EmergencyContactModel contact, bool isLast) {
+  Widget _buildContactRow(BuildContext context, ThemeData theme, EmergencyContactModel contact, bool isLast) {
     final name = contact.displayName;
     final relationship = contact.relationship?.trim().isNotEmpty == true
         ? contact.relationship!
@@ -323,10 +318,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           leading: CircleAvatar(
             radius: 24,
-            backgroundColor: const Color(0xFFE0F2FE),
+            backgroundColor: theme.colorScheme.primaryContainer,
             child: Text(
               contact.initials,
-              style: const TextStyle(color: Color(0xFF0369A1), fontWeight: FontWeight.w700),
+              style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.w700),
             ),
           ),
           title: Row(
@@ -343,24 +338,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Primary',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0369A1),
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                 ),
               ],
             ],
           ),
-          subtitle: Text('$relationship · $phone', style: const TextStyle(color: Colors.black54)),
+          subtitle: Text('$relationship · $phone', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           trailing: IconButton(
-            icon: const Icon(Icons.call, color: Color(0xFF0EA5E9)),
+            icon: Icon(Icons.call, color: theme.colorScheme.primary),
             onPressed: () async {
               try {
                 await _contactService.callContact(contact);
@@ -402,9 +397,9 @@ class _SettingsSection extends StatelessWidget {
         const SizedBox(height: 14),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(
             children: settings
@@ -415,14 +410,14 @@ class _SettingsSection extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDDEAFE),
+                        color: theme.colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(setting['icon'] as IconData, color: const Color(0xFF2563EB)),
+                      child: Icon(setting['icon'] as IconData, color: theme.colorScheme.primary),
                     ),
                     title: Text(setting['title'] as String, style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text(setting['subtitle'] as String, style: const TextStyle(color: Colors.black54)),
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Colors.black38),
+                    subtitle: Text(setting['subtitle'] as String, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
                     onTap: () {},
                   ),
                 )
