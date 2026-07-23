@@ -72,9 +72,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 26),
                 _buildEmergencyContacts(theme),
-                const SizedBox(height: 24),
-                const _SettingsSection(),
-                const SizedBox(height: 28),
               ],
             ),
           ),
@@ -370,60 +367,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         if (!isLast) const Divider(height: 0, indent: 18, endIndent: 18),
-      ],
-    );
-  }
-}
-
-class _SettingsSection extends StatelessWidget {
-  const _SettingsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    const settings = [
-      {'icon': Icons.lock_rounded, 'title': 'Privacy', 'subtitle': 'Manage permissions'},
-      {'icon': Icons.shield_rounded, 'title': 'Security', 'subtitle': 'Emergency access settings'},
-      {'icon': Icons.help_outline_rounded, 'title': 'Support', 'subtitle': 'Help center'},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Settings',
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 14),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Theme.of(context).dividerColor),
-          ),
-          child: Column(
-            children: settings
-                .map(
-                  (setting) => ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                    leading: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(setting['icon'] as IconData, color: theme.colorScheme.primary),
-                    ),
-                    title: Text(setting['title'] as String, style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text(setting['subtitle'] as String, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
-                    trailing: Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-                    onTap: () {},
-                  ),
-                )
-                .toList(),
-          ),
-        ),
       ],
     );
   }
